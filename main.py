@@ -5,6 +5,7 @@ from pydub import AudioSegment
 import tempfile
 import shutil
 from ffmpeg import audio
+import traceback  # Ensure this import is at the top of your file
 
 audio_file1 = "audio1.mp3"
 audio_file2 = "audio2.mp3"
@@ -32,7 +33,7 @@ def generate_speech(text):
 
 def change_speed(input_file, speed, output_file):
     try:
-        audio.a_speed(input_file, str(speed), output_file)
+        audio.a_speed(input_file, speed, output_file)
         ui.notify(f"音频处理成功: {output_file}")
     except Exception as e:
         ui.notify(f"处理音频时出错: {str(e)}")
@@ -40,7 +41,7 @@ def change_speed(input_file, speed, output_file):
 def on_generate():
     text = text_en.value
     if not text:
-        ui.notify("请输入文本")
+        ui.notify("请输入英文文本")
         return
     
     ui.notify("正在生成语音...")
@@ -50,18 +51,21 @@ def on_generate():
         ui.notify("语音生成成功")
         # 保存原始语音文件到本地目录，文件名为audio.mp3
         shutil.copy(speech_file, audio_file1)
-        audio1.bind_source(audio_file1)
+        audio1.set_source(audio_file1)
+        audio1.update()
+
         # 生成不同速度的音频文件
         change_speed(audio_file1, 2, audio_file2)
-        audio2.bind_source(audio_file2)
+        audio2.set_source(audio_file2)
+        audio2.update()
 
         change_speed(audio_file1, 3, audio_file3)
-        audio3.bind_source(audio_file3)
+        audio3.set_source(audio_file3)
+        audio3.update()
 
         change_speed(audio_file1, 4, audio_file4)
-        audio4.bind_source(audio_file4)
-    else:
-        ui.notify("语音生成失败")
+        audio4.set_source(audio_file4)
+        audio4.update()
 
 def on_translate():
     text = text_cn.value
@@ -80,10 +84,6 @@ def on_translate():
         translated_text = data["responseData"]["translatedText"]
         text_en.value = translated_text
         ui.notify("翻译成功")
-        os.remove(audio_file1)
-        os.remove(audio_file2)
-        os.remove(audio_file3)
-        os.remove(audio_file4)
     else:
         ui.notify("翻译失败")
 
@@ -97,22 +97,18 @@ with ui.row():
         ui.button("生成语音", on_click=on_generate)
     
     with ui.column():
-        if os.path.exists(audio_file1):
-            with ui.row():
-                ui.label(f"1倍速")
-                audio1 = ui.audio(audio_file1)
-        if os.path.exists(audio_file2):
-            with ui.row():
-                ui.label(f"2倍速")
-                audio2 = ui.audio(audio_file2)
-        if os.path.exists(audio_file3):
-            with ui.row():
-                ui.label(f"3倍速")
-                audio3 = ui.audio(audio_file3)
-        if os.path.exists(audio_file4):
-            with ui.row():
-                ui.label(f"4倍速")
-                audio4 = ui.audio(audio_file4)
+        with ui.row():
+            ui.label(f"1倍速")
+            audio1 = ui.audio(audio_file1)
+        with ui.row():
+            ui.label(f"2倍速")
+            audio2 = ui.audio(audio_file2)
+        with ui.row():
+            ui.label(f"3倍速")
+            audio3 = ui.audio(audio_file3)
+        with ui.row():
+            ui.label(f"4倍速")
+            audio4 = ui.audio(audio_file4)
 
 if __name__ in {"__main__", "__mp_main__"}:
-    ui.run(port=8080)
+    ui.run(host="127.0.0.1", port=8080)
