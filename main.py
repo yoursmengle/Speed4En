@@ -1,11 +1,9 @@
 from nicegui import ui
 import requests
-import os
 from pydub import AudioSegment
+from pydub.effects import speedup
 import tempfile
 import shutil
-from ffmpeg import audio
-import traceback  # Ensure this import is at the top of your file
 
 t = 0
 audio_file1 = "audio1.mp3"
@@ -33,10 +31,9 @@ def generate_speech(text):
         return None
 
 def change_speed(input_file, speed, output_file):
-    try:
-        audio.a_speed(input_file, speed, output_file)
-    except Exception as e:
-        ui.notify(f"处理音频时出错: {str(e)}")
+    audio = AudioSegment.from_file(input_file)
+    audio = speedup(audio, speed)
+    audio.export(output_file, format="mp3")
 
 def on_generate():
     global t
@@ -86,6 +83,28 @@ def on_translate():
     else:
         ui.notify("翻译失败")
 
+def update_audio():
+    try:
+        audio1.source = audio_file1 
+        audio1.update()
+    except:
+        pass
+    try:
+        audio2.source = audio_file2
+        audio2.update()
+    except:
+        pass
+    try:
+        audio3.source = audio_file3
+        audio3.update()
+    except:
+        pass
+    try:
+        audio4.source = audio_file4
+        audio4.update()
+    except:
+        pass
+
 with ui.row():
     with ui.column().classes('w-1/2'):
         text_cn = ui.textarea("输入中文文本").classes('w-full')
@@ -108,28 +127,14 @@ with ui.row():
         with ui.row():
             lbl4 = ui.label(f"4倍速")
             audio4 = ui.audio(audio_file4)
-def update_audio():
-
-    try:
-        audio1.source = audio_file1 
-        audio1.update()
-    except:
-        pass
-    try:
-        audio2.source = audio_file2
-        audio2.update()
-    except:
-        pass
-    try:
-        audio3.source = audio_file3
-        audio3.update()
-    except:
-        pass
-    try:
-        audio4.source = audio_file4
-        audio4.update()
-    except:
-        pass
 
 if __name__ in {"__main__", "__mp_main__"}:
-    ui.run(port=8080)
+    ui.run(
+        native = True,  # 本地运行，不使用浏览器   
+        title  = "speed4 v0.1.0",  # 窗口标题
+        reload = False,
+        dark   = False,
+        window_size = (1080, 1920),
+        fullscreen = False,
+        favicon = './favicon.ico', # 自定义图标，暂时未生效，待解决
+    )
