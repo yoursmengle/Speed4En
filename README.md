@@ -4,6 +4,8 @@
 
 ### 安装依赖包
 ```bash
+python -m venv venv
+source venv/Scripts/activate
 pip install -r requirements.txt
 ```
 
@@ -18,8 +20,6 @@ wget https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-essentials.7z
 ```bash
 python main.py
 ```
-
-## 3. 使用说明
 
 
 
