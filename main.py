@@ -3,12 +3,10 @@ import requests
 from ffmpeg import audio
 import tempfile
 import shutil
+import os
 
-t = 0
-audio_file1 = "audio1.mp3"
-audio_file2 = "audio2.mp3"
-audio_file3 = "audio3.mp3"
-audio_file4 = "audio4.mp3"
+# audio file name: audio1.mp3, audio2.mp3, audio3.mp3, audio4.mp3
+player = None
 
 # 使用免费的Text-to-Speech API
 TTS_API_URL = "https://api.streamelements.com/kappa/v2/speech"
@@ -36,34 +34,34 @@ def change_speed(input_file, speed, output_file):
         ui.notify(f"处理音频时出错: {str(e)}")
 
 def on_generate():
-    global t
-    global audio_file1
-    global audio_file2
-    global audio_file3
-    global audio_file4
-
-    t = t + 1
-    audio_file1 = f"audio1_{t}.mp3"
-    audio_file2 = f"audio2_{t}.mp3"
-    audio_file3 = f"audio3_{t}.mp3"
-    audio_file4 = f"audio4_{t}.mp3"
 
     text = text_en.value
     if not text:
         ui.notify("请输入英文文本")
         return
-    
-    speech_file = generate_speech(text)
-    
-    if speech_file:
-        ui.notify("语音生成成功")
-        # 保存原始语音文件到本地目录，文件名为audio.mp3
-        shutil.copy(speech_file, audio_file1)
+
+    # 保存原始语音文件到本地目录，文件名为audio.mp3
+    try:
+        speech_file = generate_speech(text)
+        shutil.copy(speech_file, "audio1.mp3")
+    except Exception as e:
+        ui.notify(f"处理音频时出错: {str(e)}")
+
+    try:
         # 生成不同速度的音频文件
-        change_speed(audio_file1, 2, audio_file2)
-        change_speed(audio_file1, 3, audio_file3)
-        change_speed(audio_file1, 4, audio_file4)
-        update_audio()
+        change_speed("audio1.mp3", 2, "audio2.mp3")
+    except Exception as e:
+        ui.notify(f"处理音频时出错: {str(e)}")
+
+    try:
+        change_speed("audio1.mp3", 3, "audio3.mp3")
+    except Exception as e:
+        ui.notify(f"处理音频时出错: {str(e)}")
+
+    try:
+        change_speed("audio1.mp3", 4, "audio4.mp3")
+    except Exception as e:
+        ui.notify(f"处理音频时出错: {str(e)}")
 
 def on_translate():
     text = text_cn.value
@@ -83,27 +81,22 @@ def on_translate():
     else:
         ui.notify("翻译失败")
 
-def update_audio():
-    try:
-        audio1.source = audio_file1 
-        audio1.update()
-    except:
+def on_play(speed):
+    global player
+    
+    if player is None:
         pass
-    try:
-        audio2.source = audio_file2
-        audio2.update()
-    except:
-        pass
-    try:
-        audio3.source = audio_file3
-        audio3.update()
-    except:
-        pass
-    try:
-        audio4.source = audio_file4
-        audio4.update()
-    except:
-        pass
+    elif player is ui.audio:
+        player.pause()
+        player.set_source("test.mp3")
+        player.update()
+
+    audio_name = f"audio{speed}.mp3"
+    ui.notification(f"正在播放 {audio_name}，请稍等...")
+    player = ui.audio(audio_name)
+    player.set_visibility(False)
+
+    player.play()
 
 with ui.row():
     with ui.column().classes('w-1/2'):
@@ -113,20 +106,12 @@ with ui.row():
     
     with ui.column().classes('w-1/2'):
         ui.button("生成语音", on_click=on_generate)
-
-    with ui.column():
-        with ui.row():
-            lbl1 = ui.label(f"1倍速")
-            audio1 = ui.audio(audio_file1)
-        with ui.row():
-            lbl2 = ui.label(f"2倍速")
-            audio2 = ui.audio(audio_file2)
-        with ui.row():
-            lbl3 = ui.label(f"3倍速")
-            audio3 = ui.audio(audio_file3)
-        with ui.row():
-            lbl4 = ui.label(f"4倍速")
-            audio4 = ui.audio(audio_file4)
+    
+    with ui.row():
+        b1 = ui.button("1倍速", on_click=lambda: on_play(1))
+        b2 = ui.button("2倍速", on_click=lambda: on_play(2))
+        b3 = ui.button("3倍速", on_click=lambda: on_play(3))
+        b4 = ui.button("4倍速", on_click=lambda: on_play(4))
 
 if __name__ in {"__main__", "__mp_main__"}:
     ui.run(
