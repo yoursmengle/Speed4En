@@ -1,7 +1,6 @@
 from nicegui import ui
 import requests
-from pydub import AudioSegment
-from pydub.effects import speedup
+from ffmpeg import audio
 import tempfile
 import shutil
 
@@ -31,9 +30,10 @@ def generate_speech(text):
         return None
 
 def change_speed(input_file, speed, output_file):
-    audio = AudioSegment.from_file(input_file)
-    audio = speedup(audio, speed)
-    audio.export(output_file, format="mp3")
+    try:
+        audio.a_speed(input_file, speed, output_file)
+    except Exception as e:
+        ui.notify(f"处理音频时出错: {str(e)}")
 
 def on_generate():
     global t
