@@ -132,39 +132,47 @@ def on_play(speed):
 
 # main 
 with ui.row():
-    text_cn = ui.textarea("输入中文文本").classes('w-full')
-    with ui.row():
-        ui.button("中文->英文", on_click=on_translate_c2e)
-        ui.space()
-        ui.button("英文->中文", on_click=on_translate_e2c)
+    with ui.card().classes('w-600'):
+        text_cn = ui.textarea("输入中文文本")
+        with ui.row():
+            ui.button("隐藏", on_click=lambda: text_cn.set_visibility(False))
+            ui.button("显示", on_click=lambda: text_cn.set_visibility(True))
+        ui.button("↓ 中文->英文 ↓", on_click=on_translate_c2e)
 
-    text_en = ui.textarea("输入英文文本").classes('w-full')
+    ui.space()
 
-    with ui.column().classes('w-1/2'):
-        ui.button("生成英文语音", on_click=on_generate)
+    with ui.card().classes('w-600'):
+        text_en = ui.textarea("输入英文文本")
+        with ui.row():
+            ui.button("隐藏", on_click=lambda: text_en.set_visibility(False))
+            ui.button("显示", on_click=lambda: text_en.set_visibility(True))
+        ui.button("↑ 英文->中文 ↑", on_click=on_translate_e2c)
+ui.separator()
 
-    ui.separator()
+ui.button("生成英文语音", on_click=on_generate)
 
-    with ui.row():
-        b1 = ui.button("1倍速播放", on_click=lambda: on_play(1))
-        b2 = ui.button("2倍速播放", on_click=lambda: on_play(2))
-        b3 = ui.button("3倍速播放", on_click=lambda: on_play(3))
-        b4 = ui.button("4倍速播放", on_click=lambda: on_play(4))
-    ui.separator()
-    ui.separator()
+ui.separator()
 
-    url_trans = ui.input("翻译api").classes('w-full')
-    url_trans.value = TRANSLATE_API_URL
+with ui.row():
+    b1 = ui.button("1倍速播放", on_click=lambda: on_play(1))
+    b2 = ui.button("2倍速播放", on_click=lambda: on_play(2))
+    b3 = ui.button("3倍速播放", on_click=lambda: on_play(3))
+    b4 = ui.button("4倍速播放", on_click=lambda: on_play(4))
 
-    url_tts = ui.input("TTS api").classes('w-full')
-    url_tts.value = TTS_API_URL
+ui.separator()
+ui.separator()
+
+url_trans = ui.input("翻译api").classes('w-full')
+url_trans.value = TRANSLATE_API_URL
+url_tts = ui.input("TTS api").classes('w-full')
+url_tts.value = TTS_API_URL
 
 ui.run(
     native = True,  # 本地运行，不使用浏览器   
     title  = "speed4 v0.1.0",  # 窗口标题
-    reload = True,
-    dark   = True,
-    window_size = (700, 900),
+    reload = False,
+    dark   = False,
+    window_size = (1250, 800),
     fullscreen = False,
     favicon = './favicon.ico', # 自定义图标
 )       
