@@ -22,7 +22,7 @@ def generate_speech(text):
         "voice": "Brian",
         "text": text
     }
-    response = requests.get(TTS_API_URL, params=params)
+    response = requests.get(url_tts.value, params=params)
     if response.status_code == 200:
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as temp_file:
             temp_file.write(response.content)
@@ -88,12 +88,11 @@ def on_translate():
         "q": text,
         "langpair": "zh-CN|en"
     }
-    response = requests.get(TRANSLATE_API_URL, params=params)
+    response = requests.get(url_trans.value, params=params)
     if response.status_code == 200:
         data = response.json()
         translated_text = data["responseData"]["translatedText"]
         text_en.value = translated_text
-        ui.notify("翻译成功", translated_text)
     else:
         ui.notify("翻译失败")
 
@@ -114,19 +113,29 @@ def on_play(speed):
     player.play()
 
 with ui.row():
-    with ui.column().classes('w-1/2'):
-        text_cn = ui.textarea("输入中文文本").classes('w-full')
-        ui.button("翻译为英文", on_click=on_translate)
-        text_en = ui.textarea("输入英文文本").classes('w-full')
-    
+    text_cn = ui.textarea("输入中文文本").classes('w-full')
+
+    ui.button("翻译为英文", on_click=on_translate)
+    text_en = ui.textarea("输入英文文本").classes('w-full')
+
     with ui.column().classes('w-1/2'):
         ui.button("生成英文语音", on_click=on_generate)
-    
+
+    ui.separator()
+
     with ui.row():
-        b1 = ui.button("1倍速", on_click=lambda: on_play(1))
-        b2 = ui.button("2倍速", on_click=lambda: on_play(2))
-        b3 = ui.button("3倍速", on_click=lambda: on_play(3))
-        b4 = ui.button("4倍速", on_click=lambda: on_play(4))
+        b1 = ui.button("1倍速播放", on_click=lambda: on_play(1))
+        b2 = ui.button("2倍速播放", on_click=lambda: on_play(2))
+        b3 = ui.button("3倍速播放", on_click=lambda: on_play(3))
+        b4 = ui.button("4倍速播放", on_click=lambda: on_play(4))
+    ui.separator()
+    ui.separator()
+
+    url_trans = ui.input("翻译api").classes('w-full')
+    url_trans.value = TRANSLATE_API_URL
+
+    url_tts = ui.input("TTS api").classes('w-full')
+    url_tts.value = TTS_API_URL
 
 if __name__ in {"__main__", "__mp_main__"}:
     ui.run(
@@ -134,7 +143,7 @@ if __name__ in {"__main__", "__mp_main__"}:
         title  = "speed4 v0.1.0",  # 窗口标题
         reload = False,
         dark   = False,
-        window_size = (1080, 1920),
+        window_size = (600, 800),
         fullscreen = False,
         favicon = './favicon.ico', # 自定义图标，暂时未生效，待解决
     )
