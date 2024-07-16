@@ -8,6 +8,9 @@ import os
 # audio file name: audio1.mp3, audio2.mp3, audio3.mp3, audio4.mp3
 player = None
 
+t = 1 # generate counter
+audio_files = ["0.mp3", "1.mp3", "2.mp3", "3.mp3", "4.mp3"] # 0.mp3 is a file for placeholder
+
 # 使用免费的Text-to-Speech API
 TTS_API_URL = "https://api.streamelements.com/kappa/v2/speech"
 
@@ -34,32 +37,39 @@ def change_speed(input_file, speed, output_file):
         ui.notify(f"处理音频时出错: {str(e)}")
 
 def on_generate():
+    global t
+    global audio_files
 
     text = text_en.value
     if not text:
         ui.notify("请输入英文文本")
         return
+    t += 1
+    audio_files[1] = f"{t}1.mp3"
+    audio_files[2] = f"{t}2.mp3"
+    audio_files[3] = f"{t}3.mp3"
+    audio_files[4] = f"{t}4.mp3"
 
     # 保存原始语音文件到本地目录，文件名为audio.mp3
     try:
         speech_file = generate_speech(text)
-        shutil.copy(speech_file, "audio1.mp3")
+        shutil.copy(speech_file, audio_files[1]) 
     except Exception as e:
         ui.notify(f"处理音频时出错: {str(e)}")
 
     try:
         # 生成不同速度的音频文件
-        change_speed("audio1.mp3", 2, "audio2.mp3")
+        change_speed(audio_files[1], 2, audio_files[2])
     except Exception as e:
         ui.notify(f"处理音频时出错: {str(e)}")
 
     try:
-        change_speed("audio1.mp3", 3, "audio3.mp3")
+        change_speed(audio_files[1],3, audio_files[3])
     except Exception as e:
         ui.notify(f"处理音频时出错: {str(e)}")
 
     try:
-        change_speed("audio1.mp3", 4, "audio4.mp3")
+        change_speed(audio_files[1],4, audio_files[4])
     except Exception as e:
         ui.notify(f"处理音频时出错: {str(e)}")
 
@@ -83,29 +93,28 @@ def on_translate():
 
 def on_play(speed):
     global player
+    global audio_files
     
     if player is None:
-        pass
-    elif player is ui.audio:
+        player = ui.audio(audio_files[speed])
+        player.set_visibility(False)
+    else:
         player.pause()
-        player.set_source("test.mp3")
+        player.set_source(audio_files[speed])
         player.update()
-
-    audio_name = f"audio{speed}.mp3"
-    ui.notification(f"正在播放 {audio_name}，请稍等...")
-    player = ui.audio(audio_name)
-    player.set_visibility(False)
-
+    
+    # need to destroy the player after using, cannot find the method yet
+    ui.notification(f"正在播放 {audio_files[speed]}，请稍等...")
     player.play()
 
 with ui.row():
     with ui.column().classes('w-1/2'):
         text_cn = ui.textarea("输入中文文本").classes('w-full')
-        ui.button("翻译", on_click=on_translate)
+        ui.button("翻译为英文", on_click=on_translate)
         text_en = ui.textarea("输入英文文本").classes('w-full')
     
     with ui.column().classes('w-1/2'):
-        ui.button("生成语音", on_click=on_generate)
+        ui.button("生成英文语音", on_click=on_generate)
     
     with ui.row():
         b1 = ui.button("1倍速", on_click=lambda: on_play(1))
