@@ -78,7 +78,7 @@ def on_generate():
     except Exception as e:
         ui.notify(f"处理音频时出错: {str(e)}")
 
-def on_translate():
+def on_translate_c2e():
     text = text_cn.value
     if not text:
         ui.notify("请输入中文文本")
@@ -96,6 +96,25 @@ def on_translate():
     else:
         ui.notify("翻译失败")
 
+
+def on_translate_e2c():
+    text = text_en.value
+    if not text:
+        ui.notify("请输入英文文本")
+        return
+    
+    params = {
+        "q": text,
+        "langpair": "en|zh-CN"
+    }
+    response = requests.get(url_trans.value, params=params)
+    if response.status_code == 200:
+        data = response.json()
+        translated_text = data["responseData"]["translatedText"]
+        text_cn.value = translated_text
+    else:
+        ui.notify("翻译失败")
+
 def on_play(speed):
     global player
     global audio_files
@@ -109,44 +128,43 @@ def on_play(speed):
         player.update()
     
     # need to destroy the player after using, cannot find the method yet
-    ui.notification(f"正在播放 {audio_files[speed]}，请稍等...")
     player.play()
 
-def main():
+# main 
+with ui.row():
+    text_cn = ui.textarea("输入中文文本").classes('w-full')
     with ui.row():
-        text_cn = ui.textarea("输入中文文本").classes('w-full')
-    
-        ui.button("翻译为英文", on_click=on_translate)
-        text_en = ui.textarea("输入英文文本").classes('w-full')
-    
-        with ui.column().classes('w-1/2'):
-            ui.button("生成英文语音", on_click=on_generate)
-    
-        ui.separator()
-    
-        with ui.row():
-            b1 = ui.button("1倍速播放", on_click=lambda: on_play(1))
-            b2 = ui.button("2倍速播放", on_click=lambda: on_play(2))
-            b3 = ui.button("3倍速播放", on_click=lambda: on_play(3))
-            b4 = ui.button("4倍速播放", on_click=lambda: on_play(4))
-        ui.separator()
-        ui.separator()
-    
-        url_trans = ui.input("翻译api").classes('w-full')
-        url_trans.value = TRANSLATE_API_URL
-    
-        url_tts = ui.input("TTS api").classes('w-full')
-        url_tts.value = TTS_API_URL
+        ui.button("中文->英文", on_click=on_translate_c2e)
+        ui.space()
+        ui.button("英文->中文", on_click=on_translate_e2c)
 
-        ui.run(
-            native = True,  # 本地运行，不使用浏览器   
-            title  = "speed4 v0.1.0",  # 窗口标题
-            reload = True,
-            dark   = True,
-            window_size = (600, 800),
-            fullscreen = False,
-            favicon = './favicon.ico', # 自定义图标
-        )       
+    text_en = ui.textarea("输入英文文本").classes('w-full')
 
-if __name__ in {"__main__", "__mp_main__"}:
-    main()
+    with ui.column().classes('w-1/2'):
+        ui.button("生成英文语音", on_click=on_generate)
+
+    ui.separator()
+
+    with ui.row():
+        b1 = ui.button("1倍速播放", on_click=lambda: on_play(1))
+        b2 = ui.button("2倍速播放", on_click=lambda: on_play(2))
+        b3 = ui.button("3倍速播放", on_click=lambda: on_play(3))
+        b4 = ui.button("4倍速播放", on_click=lambda: on_play(4))
+    ui.separator()
+    ui.separator()
+
+    url_trans = ui.input("翻译api").classes('w-full')
+    url_trans.value = TRANSLATE_API_URL
+
+    url_tts = ui.input("TTS api").classes('w-full')
+    url_tts.value = TTS_API_URL
+
+ui.run(
+    native = True,  # 本地运行，不使用浏览器   
+    title  = "speed4 v0.1.0",  # 窗口标题
+    reload = True,
+    dark   = True,
+    window_size = (700, 900),
+    fullscreen = False,
+    favicon = './favicon.ico', # 自定义图标
+)       
