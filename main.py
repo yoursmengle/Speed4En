@@ -44,6 +44,11 @@ def on_generate():
     if not text:
         ui.notify("请输入英文文本")
         return
+
+    for f in audio_files:
+        if os.path.exists(f):
+            os.remove(f)
+
     t += 1
     audio_files[1] = f"{t}1.mp3"
     audio_files[2] = f"{t}2.mp3"
@@ -88,6 +93,7 @@ def on_translate():
         data = response.json()
         translated_text = data["responseData"]["translatedText"]
         text_en.value = translated_text
+        ui.notify("翻译成功", translated_text)
     else:
         ui.notify("翻译失败")
 
