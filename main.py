@@ -10,6 +10,7 @@ player = None
 
 t = 1 # generate counter
 audio_files = ["0.mp3", "1.mp3", "2.mp3", "3.mp3", "4.mp3"] # 0.mp3 is a file for placeholder
+audio_ok = False
 
 # 使用免费的Text-to-Speech API
 TTS_API_URL = "https://api.streamelements.com/kappa/v2/speech"
@@ -45,6 +46,11 @@ def on_generate():
         ui.notify("请输入英文文本")
         return
 
+    b1.disabled = True
+    b2.disabled = True
+    b3.disabled = True
+    b4.disabled = True
+
     for f in audio_files:
         if os.path.exists(f):
             os.remove(f)
@@ -59,22 +65,26 @@ def on_generate():
     try:
         speech_file = generate_speech(text)
         shutil.copy(speech_file, audio_files[1]) 
+        b1.disabled = False
     except Exception as e:
         ui.notify(f"处理音频时出错: {str(e)}")
 
     try:
         # 生成不同速度的音频文件
         change_speed(audio_files[1], 2, audio_files[2])
+        b2.disabled = False
     except Exception as e:
         ui.notify(f"处理音频时出错: {str(e)}")
 
     try:
         change_speed(audio_files[1],3, audio_files[3])
+        b3.disabled = False
     except Exception as e:
         ui.notify(f"处理音频时出错: {str(e)}")
 
     try:
         change_speed(audio_files[1],4, audio_files[4])
+        b4.disabled = False
     except Exception as e:
         ui.notify(f"处理音频时出错: {str(e)}")
 
@@ -118,6 +128,10 @@ def on_translate_e2c():
 def on_play(speed):
     global player
     global audio_files
+
+    if os.path.exists(audio_files[speed]) == False:
+        ui.notify("请先生成音频文件")
+        return
     
     if player is None:
         player = ui.audio(audio_files[speed])
@@ -132,21 +146,21 @@ def on_play(speed):
 
 # main 
 with ui.row():
-    with ui.card().classes('w-600'):
-        text_cn = ui.textarea("输入中文文本")
+    with ui.card():
+        ui.markdown("中文文本")
+        text_cn = ui.textarea("输入中文文本").classes('w-full')
         with ui.row():
             ui.button("隐藏", on_click=lambda: text_cn.set_visibility(False))
             ui.button("显示", on_click=lambda: text_cn.set_visibility(True))
-        ui.button("↓ 中文->英文 ↓", on_click=on_translate_c2e)
+            ui.button("中 --> 英", on_click=on_translate_c2e)
 
-    ui.space()
-
-    with ui.card().classes('w-600'):
-        text_en = ui.textarea("输入英文文本")
+    with ui.card():
+        ui.markdown("English Text")
+        text_en = ui.textarea("输入英文文本").classes('w-full')
         with ui.row():
+            ui.button("中 <-- 英", on_click=on_translate_e2c)
             ui.button("隐藏", on_click=lambda: text_en.set_visibility(False))
             ui.button("显示", on_click=lambda: text_en.set_visibility(True))
-        ui.button("↑ 英文->中文 ↑", on_click=on_translate_e2c)
 ui.separator()
 
 ui.button("生成英文语音", on_click=on_generate)
@@ -172,7 +186,7 @@ ui.run(
     title  = "speed4 v0.1.0",  # 窗口标题
     reload = False,
     dark   = False,
-    window_size = (1250, 800),
+    window_size = (1100, 900),
     fullscreen = False,
     favicon = './favicon.ico', # 自定义图标
 )       
