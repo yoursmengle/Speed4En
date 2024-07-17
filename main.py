@@ -150,8 +150,8 @@ with ui.row():
         ui.markdown("中文文本")
         text_cn = ui.textarea("输入中文文本").classes('w-full')
         with ui.row():
-            ui.button("隐藏", on_click=lambda: text_cn.set_visibility(False))
-            ui.button("显示", on_click=lambda: text_cn.set_visibility(True))
+            ui.button("隐藏", on_click=lambda: text_cn.set_visibility(False), color='red')
+            ui.button("显示", on_click=lambda: text_cn.set_visibility(True), color='green')
             ui.button("中 --> 英", on_click=on_translate_c2e)
 
     with ui.card():
@@ -159,19 +159,19 @@ with ui.row():
         text_en = ui.textarea("输入英文文本").classes('w-full')
         with ui.row():
             ui.button("中 <-- 英", on_click=on_translate_e2c)
-            ui.button("隐藏", on_click=lambda: text_en.set_visibility(False))
-            ui.button("显示", on_click=lambda: text_en.set_visibility(True))
+            ui.button("隐藏", on_click=lambda: text_en.set_visibility(False), color='red')
+            ui.button("显示", on_click=lambda: text_en.set_visibility(True), color='green')
 ui.separator()
 
-ui.button("生成英文语音", on_click=on_generate)
+ui.button("生成英文语音", on_click=on_generate, color='purple')
 
 ui.separator()
 
 with ui.row():
-    b1 = ui.button("1倍速播放", on_click=lambda: on_play(1))
-    b2 = ui.button("2倍速播放", on_click=lambda: on_play(2))
-    b3 = ui.button("3倍速播放", on_click=lambda: on_play(3))
-    b4 = ui.button("4倍速播放", on_click=lambda: on_play(4))
+    b1 = ui.button("1倍速播放", on_click=lambda: on_play(1), color='green')
+    b2 = ui.button("2倍速播放", on_click=lambda: on_play(2), color='blue')
+    b3 = ui.button("3倍速播放", on_click=lambda: on_play(3), color='yellow')
+    b4 = ui.button("4倍速播放", on_click=lambda: on_play(4), color='red')
 
 ui.separator()
 ui.separator()
