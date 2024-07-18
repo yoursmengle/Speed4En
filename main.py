@@ -4,6 +4,10 @@ from ffmpeg import audio
 import tempfile
 import shutil
 import os
+from datetime import datetime
+
+#from niceguiToolkit.layout import inject_layout_tool
+#inject_layout_tool()
 
 # audio file name: audio1.mp3, audio2.mp3, audio3.mp3, audio4.mp3
 player = None
@@ -91,6 +95,8 @@ def on_generate():
     except Exception as e:
         ui.notify(f"处理音频时出错: {str(e)}")
 
+    ui.notify("音频文件生成完成")
+
 def on_translate_c2e():
     text = text_cn.value
     if not text:
@@ -106,6 +112,7 @@ def on_translate_c2e():
         data = response.json()
         translated_text = data["responseData"]["translatedText"]
         text_en.value = translated_text
+        ui.notify("翻译完成")
     else:
         ui.notify("翻译失败")
 
@@ -125,6 +132,7 @@ def on_translate_e2c():
         data = response.json()
         translated_text = data["responseData"]["translatedText"]
         text_cn.value = translated_text
+        ui.notify("翻译完成")
     else:
         ui.notify("翻译失败")
 
@@ -156,49 +164,76 @@ def on_en_display():
     text_en_2.set_visibility(False)
 
 def on_cn_disappear():
+    if text_cn.value == "":
+        return
+
     text_cn.set_visibility(False)
     text_cn_2.value = "内容已隐藏"
     text_cn_2.set_visibility(True)
 
 def on_en_disappear():
+    if text_en.value == "":
+        return
+
     text_en.set_visibility(False)
-    text_en_2.value = "text is hidden"
+    text_en_2.value = "内容已隐藏"
     text_en_2.set_visibility(True)
 
 # main 
-with ui.row():
+ui.markdown("## 四倍速英语听力训练 v0.1.0")
+
+examples_cn = []
+examples_en = []
+
+# 读取示例文本, 并将每一行保存到一个列表中
+with open('examples_cn.txt', 'r', encoding='utf-8') as f:
+    examples_cn = f.readlines()
+
+with open('examples_en.txt', 'r', encoding='utf-8') as f:
+    examples_en = f.readlines()
+
+with ui.row().style("height:auto;width:auto"):
     with ui.card():
         ui.markdown("中文文本")
+        ui.separator()
         text_cn = ui.textarea("输入中文文本").classes('w-full')
         text_cn_2 = ui.textarea("输入中文文本").classes('w-full')
         text_cn_2.set_visibility(False)
 
         with ui.row():
-            ui.button("隐藏", on_click=on_cn_disappear, color='red')
-            ui.button("显示", on_click=on_cn_display, color='green')
-            ui.button("中 --> 英", on_click=on_translate_c2e)
+            ui.button("生成", icon='history', on_click=lambda: text_cn.set_value(examples_cn[datetime.now().second%len(examples_cn)]), color='green')
+            ui.button("隐藏", icon='lock', on_click=on_cn_disappear, color='lightgreen')
+            ui.button("显示", icon='visibility', on_click=on_cn_display, color='lightblue')
+            ui.button("清空", icon='clear', on_click=lambda: text_cn.set_value(''), color='blue')
+
+    with ui.column():
+        ui.markdown("翻译")
+        blt_en = ui.button(icon='arrow_forward', on_click=on_translate_c2e)
+        blt_cn = ui.button(icon='arrow_back', on_click=on_translate_e2c)
 
     with ui.card():
-        ui.markdown("English Text")
+        ui.markdown("英文文本")
+        ui.separator()
         text_en = ui.textarea("输入英文文本").classes('w-full')
         text_en_2 = ui.textarea("输入英文文本").classes('w-full')
         text_en_2.set_visibility(False)
 
         with ui.row():
-            ui.button("中 <-- 英", on_click=on_translate_e2c)
-            ui.button("隐藏", on_click=on_en_disappear, color='red')
-            ui.button("显示", on_click=on_en_display, color='green')
+            ui.button("生成", icon='history', on_click=lambda: text_en.set_value(examples_en[datetime.now().second%len(examples_en)]), color='green')
+            ui.button("隐藏", icon='lock', on_click=on_en_disappear, color='lightgreen')
+            ui.button("显示", icon='visibility', on_click=on_en_display, color='lightblue')
+            ui.button("清空", icon='clear', on_click=lambda: text_en.set_value(''), color='blue')
 ui.separator()
 
-ui.button("生成英文语音", on_click=on_generate, color='purple')
+ui.button("生成英文语音", icon='audio_file', on_click=on_generate, color='lightblue')
 
 ui.separator()
 
 with ui.row():
-    b1 = ui.button("1倍速播放", on_click=lambda: on_play(1), color='green')
-    b2 = ui.button("2倍速播放", on_click=lambda: on_play(2), color='blue')
-    b3 = ui.button("3倍速播放", on_click=lambda: on_play(3), color='yellow')
-    b4 = ui.button("4倍速播放", on_click=lambda: on_play(4), color='red')
+    b1 = ui.button("1倍速播放", icon='play_circle', on_click=lambda: on_play(1), color='lightgreen')
+    b2 = ui.button("2倍速播放", icon='play_circle', on_click=lambda: on_play(2), color='lightblue')
+    b3 = ui.button("3倍速播放", icon='play_circle', on_click=lambda: on_play(3), color='green')
+    b4 = ui.button("4倍速播放", icon='play_circle', on_click=lambda: on_play(4), color='blue')
 
 ui.separator()
 ui.separator()
@@ -213,7 +248,7 @@ ui.run(
     title  = "speed4 v0.1.0",  # 窗口标题
     reload = False,
     dark   = False,
-    window_size = (1100, 900),
+    window_size = (1600, 1200),
     fullscreen = False,
     favicon = './favicon.ico', # 自定义图标
 )       
