@@ -45,6 +45,9 @@ def on_generate():
     if not text:
         ui.notify("请输入英文文本")
         return
+    
+    on_cn_display()
+    on_en_display()
 
     b1.disabled = True
     b2.disabled = True
@@ -144,23 +147,47 @@ def on_play(speed):
     # need to destroy the player after using, cannot find the method yet
     player.play()
 
+def on_cn_display():
+    text_cn.set_visibility(True)
+    text_cn_2.set_visibility(False)
+
+def on_en_display():
+    text_en.set_visibility(True)
+    text_en_2.set_visibility(False)
+
+def on_cn_disappear():
+    text_cn.set_visibility(False)
+    text_cn_2.value = "内容已隐藏"
+    text_cn_2.set_visibility(True)
+
+def on_en_disappear():
+    text_en.set_visibility(False)
+    text_en_2.value = "text is hidden"
+    text_en_2.set_visibility(True)
+
 # main 
 with ui.row():
     with ui.card():
         ui.markdown("中文文本")
         text_cn = ui.textarea("输入中文文本").classes('w-full')
+        text_cn_2 = ui.textarea("输入中文文本").classes('w-full')
+        text_cn_2.set_visibility(False)
+
         with ui.row():
-            ui.button("隐藏", on_click=lambda: text_cn.set_visibility(False), color='red')
-            ui.button("显示", on_click=lambda: text_cn.set_visibility(True), color='green')
+            ui.button("隐藏", on_click=on_cn_disappear, color='red')
+            ui.button("显示", on_click=on_cn_display, color='green')
             ui.button("中 --> 英", on_click=on_translate_c2e)
 
     with ui.card():
         ui.markdown("English Text")
         text_en = ui.textarea("输入英文文本").classes('w-full')
+        text_en_2 = ui.textarea("输入英文文本").classes('w-full')
+        text_en_2.set_visibility(False)
+
         with ui.row():
             ui.button("中 <-- 英", on_click=on_translate_e2c)
-            ui.button("隐藏", on_click=lambda: text_en.set_visibility(False), color='red')
-            ui.button("显示", on_click=lambda: text_en.set_visibility(True), color='green')
+            ui.button("隐藏", on_click=on_en_disappear, color='red')
+            ui.button("显示", on_click=on_en_display, color='green')
 ui.separator()
 
 ui.button("生成英文语音", on_click=on_generate, color='purple')
