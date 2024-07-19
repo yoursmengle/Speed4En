@@ -201,15 +201,15 @@ with ui.row().style("height:auto;width:auto"):
         text_cn_2.set_visibility(False)
 
         with ui.row():
-            ui.button("生成", icon='history', on_click=lambda: text_cn.set_value(examples_cn[datetime.now().second%len(examples_cn)]), color='green')
-            ui.button("隐藏", icon='lock', on_click=on_cn_disappear, color='lightgreen')
-            ui.button("显示", icon='visibility', on_click=on_cn_display, color='lightblue')
-            ui.button("清空", icon='clear', on_click=lambda: text_cn.set_value(''), color='blue')
+            ui.button("生成", icon='history', on_click=lambda: text_cn.set_value(examples_cn[datetime.now().second%len(examples_cn)]), color='blue')
+            ui.button("隐藏", icon='lock', on_click=on_cn_disappear, color='lightblue')
+            ui.button("显示", icon='visibility', on_click=on_cn_display, color='green')
+            ui.button("清空", icon='clear', on_click=lambda: text_cn.set_value(''), color='lightgreen')
 
     with ui.column():
         ui.markdown("翻译")
-        blt_en = ui.button(icon='arrow_forward', on_click=on_translate_c2e)
-        blt_cn = ui.button(icon='arrow_back', on_click=on_translate_e2c)
+        blt_en = ui.button(icon='arrow_forward', on_click=on_translate_c2e, color='lightblue')
+        blt_cn = ui.button(icon='arrow_back', on_click=on_translate_e2c, color='lightblue')
 
     with ui.card():
         ui.markdown("英文文本")
@@ -219,10 +219,10 @@ with ui.row().style("height:auto;width:auto"):
         text_en_2.set_visibility(False)
 
         with ui.row():
-            ui.button("生成", icon='history', on_click=lambda: text_en.set_value(examples_en[datetime.now().second%len(examples_en)]), color='green')
-            ui.button("隐藏", icon='lock', on_click=on_en_disappear, color='lightgreen')
-            ui.button("显示", icon='visibility', on_click=on_en_display, color='lightblue')
-            ui.button("清空", icon='clear', on_click=lambda: text_en.set_value(''), color='blue')
+            ui.button("生成", icon='history', on_click=lambda: text_en.set_value(examples_en[datetime.now().second%len(examples_en)]), color='blue')
+            ui.button("隐藏", icon='lock', on_click=on_en_disappear, color='lightblue')
+            ui.button("显示", icon='visibility', on_click=on_en_display, color='green')
+            ui.button("清空", icon='clear', on_click=lambda: text_en.set_value(''), color='lightgreen')
 ui.separator()
 
 ui.button("生成英文语音", icon='audio_file', on_click=on_generate, color='lightblue')
@@ -230,10 +230,10 @@ ui.button("生成英文语音", icon='audio_file', on_click=on_generate, color='
 ui.separator()
 
 with ui.row():
-    b1 = ui.button("1倍速播放", icon='play_circle', on_click=lambda: on_play(1), color='lightgreen')
+    b1 = ui.button("1倍速播放", icon='play_circle', on_click=lambda: on_play(1), color='blue')
     b2 = ui.button("2倍速播放", icon='play_circle', on_click=lambda: on_play(2), color='lightblue')
     b3 = ui.button("3倍速播放", icon='play_circle', on_click=lambda: on_play(3), color='green')
-    b4 = ui.button("4倍速播放", icon='play_circle', on_click=lambda: on_play(4), color='blue')
+    b4 = ui.button("4倍速播放", icon='play_circle', on_click=lambda: on_play(4), color='lightgreen')
 
 ui.separator()
 ui.separator()
