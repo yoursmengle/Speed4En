@@ -5,6 +5,7 @@ import tempfile
 import shutil
 import os
 from datetime import datetime
+import difflib
 
 #from niceguiToolkit.layout import inject_layout_tool
 #inject_layout_tool()
@@ -50,9 +51,6 @@ def on_generate():
         ui.notify("请输入英文文本")
         return
     
-    on_cn_display()
-    on_en_display()
-
     b1.disabled = True
     b2.disabled = True
     b3.disabled = True
@@ -112,6 +110,10 @@ def on_translate_c2e():
         data = response.json()
         translated_text = data["responseData"]["translatedText"]
         text_en.value = translated_text
+        if auto_hide.value:
+            on_en_disappear()
+        else:
+            on_en_display()
         ui.notify("翻译完成")
     else:
         ui.notify("翻译失败")
@@ -132,6 +134,7 @@ def on_translate_e2c():
         data = response.json()
         translated_text = data["responseData"]["translatedText"]
         text_cn.value = translated_text
+        on_cn_display()
         ui.notify("翻译完成")
     else:
         ui.notify("翻译失败")
@@ -179,8 +182,62 @@ def on_en_disappear():
     text_en_2.value = "内容已隐藏"
     text_en_2.set_visibility(True)
 
+
+def highlight_differences(text1, text2):
+    # Generate a sequence matcher object
+    s = difflib.SequenceMatcher(None, text1, text2)
+    output = []
+
+    # Loop through the matching blocks and differences
+    for opcode, a0, a1, b0, b1 in s.get_opcodes():
+        if opcode == 'equal':
+            output.append(text1[a0:a1])
+        elif opcode in ('replace', 'delete'):
+            output.append(f"<span style='color: red;'>{text1[a0:a1]}</span>")
+        elif opcode == 'insert':
+            output.append(f"<span style='color: red;'>{text2[b0:b1]}</span>")
+    
+    return ''.join(output)
+
+def on_check():
+    try:
+        if text_en.value == "" or text_writing.value == "":
+            ui.notify("请确保两个文本框都有内容")
+            return
+    
+        if text_en.value == text_writing.value:
+            result.set_content("")
+            result.update()
+            ui.notify("完全正确")
+            return
+    except Exception as e:
+        ui.notify(f"检查时出错: {str(e)}")
+        return
+
+    # Highlight differences
+    highlighted_diff = highlight_differences(text_en.value, text_writing.value)
+    
+    # Display the result
+    # display with html format
+    result.set_content("###" + highlighted_diff)
+    result.update()
+
+# Assuming text_en and text_writing are defined elsewhere in your NiceGUI app
+# Example usage:
+
+# on_check()
+
+def on_gen_cn():
+    text_cn.set_value(examples_cn[datetime.now().microsecond%len(examples_cn)])
+    on_cn_display()
+
+def on_gen_en():
+    text_en.set_value(examples_en[datetime.now().microsecond%len(examples_en)])
+
+
 # main 
 ui.markdown("## 四倍速英语听力训练 v0.1.0")
+ui.separator()
 
 examples_cn = []
 examples_en = []
@@ -196,46 +253,55 @@ with ui.row().style("height:auto;width:auto"):
     with ui.card():
         ui.markdown("中文文本")
         ui.separator()
-        text_cn = ui.textarea("输入中文文本").classes('w-full')
+        text_cn = ui.textarea("输入中文文本").classes('w-full').props('clearable')
         text_cn_2 = ui.textarea("输入中文文本").classes('w-full')
         text_cn_2.set_visibility(False)
 
         with ui.row():
-            ui.button("生成", icon='history', on_click=lambda: text_cn.set_value(examples_cn[datetime.now().second%len(examples_cn)]), color='blue')
-            ui.button("隐藏", icon='lock', on_click=on_cn_disappear, color='lightblue')
-            ui.button("显示", icon='visibility', on_click=on_cn_display, color='green')
+            ui.button("生成", icon='history', on_click=on_gen_cn, color='lightgreen')
+            ui.button("隐藏", icon='lock', on_click=on_cn_disappear, color='lightgreen')
+            ui.button("显示", icon='visibility', on_click=on_cn_display, color='lightgreen')
             ui.button("清空", icon='clear', on_click=lambda: text_cn.set_value(''), color='lightgreen')
 
     with ui.column():
         ui.markdown("翻译")
         blt_en = ui.button(icon='arrow_forward', on_click=on_translate_c2e, color='lightblue')
-        blt_cn = ui.button(icon='arrow_back', on_click=on_translate_e2c, color='lightblue')
+        blt_cn = ui.button(icon='arrow_back', on_click=on_translate_e2c, color='lightgreen')
+        ui.separator()
+        auto_hide = ui.checkbox("自动隐藏", value=False)
 
     with ui.card():
         ui.markdown("英文文本")
         ui.separator()
-        text_en = ui.textarea("输入英文文本").classes('w-full')
+        text_en = ui.textarea("输入英文文本").classes('w-full').props('clearable')
         text_en_2 = ui.textarea("输入英文文本").classes('w-full')
         text_en_2.set_visibility(False)
 
         with ui.row():
-            ui.button("生成", icon='history', on_click=lambda: text_en.set_value(examples_en[datetime.now().second%len(examples_en)]), color='blue')
+            ui.button("生成", icon='history', on_click=on_gen_en, color='lightblue')
             ui.button("隐藏", icon='lock', on_click=on_en_disappear, color='lightblue')
-            ui.button("显示", icon='visibility', on_click=on_en_display, color='green')
-            ui.button("清空", icon='clear', on_click=lambda: text_en.set_value(''), color='lightgreen')
+            ui.button("显示", icon='visibility', on_click=on_en_display, color='lightblue')
+            ui.button("清空", icon='clear', on_click=lambda: text_en.set_value(''), color='lightblue')
 ui.separator()
 
-ui.button("生成英文语音", icon='audio_file', on_click=on_generate, color='lightblue')
-
-ui.separator()
 
 with ui.row():
-    b1 = ui.button("1倍速播放", icon='play_circle', on_click=lambda: on_play(1), color='blue')
+    ui.button("生成英文语音", icon='audio_file', on_click=on_generate, color='green')
+    ui.space()
+    ui.space()
+    ui.space()
+    b1 = ui.button("1倍速播放", icon='play_circle', on_click=lambda: on_play(1), color='lightblue')
     b2 = ui.button("2倍速播放", icon='play_circle', on_click=lambda: on_play(2), color='lightblue')
-    b3 = ui.button("3倍速播放", icon='play_circle', on_click=lambda: on_play(3), color='green')
-    b4 = ui.button("4倍速播放", icon='play_circle', on_click=lambda: on_play(4), color='lightgreen')
+    b3 = ui.button("3倍速播放", icon='play_circle', on_click=lambda: on_play(3), color='lightblue')
+    b4 = ui.button("4倍速播放", icon='play_circle', on_click=lambda: on_play(4), color='lightblue')
+    ui.space()
+    ui.space()
+    ui.space()
+    ui.button("听写检查", icon='check', on_click=on_check, color='green')
 
 ui.separator()
+text_writing = ui.textarea("听写区域").classes('w-full').props('clearable')
+result = ui.markdown("")
 ui.separator()
 
 url_trans = ui.input("翻译api").classes('w-full')
@@ -248,7 +314,7 @@ ui.run(
     title  = "speed4 v0.1.0",  # 窗口标题
     reload = False,
     dark   = False,
-    window_size = (1600, 1200),
+    window_size = (1800, 1200),
     fullscreen = False,
     favicon = './favicon.ico', # 自定义图标
 )       
