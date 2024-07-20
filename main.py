@@ -276,9 +276,9 @@ with ui.row().style("height:auto;width:auto"):
             ui.button("清空", icon='clear', on_click=lambda: text_cn.set_value(''), color='lightgreen')
 
     with ui.column():
-        ui.markdown("翻译")
-        ui.button(icon='arrow_forward', on_click=on_translate_c2e, color='lightblue')
-        ui.button(icon='arrow_back', on_click=on_translate_e2c, color='lightgreen')
+        ui.html('<center>翻   译</center>').classes('w-full')
+        ui.button(icon='arrow_forward', on_click=on_translate_c2e, color='lightblue').classes('w-full')
+        ui.button(icon='arrow_back', on_click=on_translate_e2c, color='lightgreen').classes('w-full')
         ui.separator()
         ui.button("保存", icon='save', on_click=on_save, color='lightblue')
         ui.separator()
