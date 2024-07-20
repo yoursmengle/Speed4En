@@ -234,6 +234,18 @@ def on_gen_cn():
 def on_gen_en():
     text_en.set_value(examples_en[datetime.now().microsecond%len(examples_en)])
 
+def on_save():
+    if text_cn.value == "" and text_en.value == "":
+        return
+
+    if len(text_cn.value) > 5:
+        with open('examples_cn.txt', 'a', encoding='utf-8') as f:
+            f.write(text_cn.value + '\n')
+    if len(text_en.value) > 5:
+        with open('examples_en.txt', 'a', encoding='utf-8') as f:
+            f.write(text_en.value + '\n')
+
+    ui.notify("保存成功")
 
 # main 
 ui.markdown("## 四倍速英语听力训练 v0.1.0")
@@ -265,8 +277,10 @@ with ui.row().style("height:auto;width:auto"):
 
     with ui.column():
         ui.markdown("翻译")
-        blt_en = ui.button(icon='arrow_forward', on_click=on_translate_c2e, color='lightblue')
-        blt_cn = ui.button(icon='arrow_back', on_click=on_translate_e2c, color='lightgreen')
+        ui.button(icon='arrow_forward', on_click=on_translate_c2e, color='lightblue')
+        ui.button(icon='arrow_back', on_click=on_translate_e2c, color='lightgreen')
+        ui.separator()
+        ui.button("保存", icon='save', on_click=on_save, color='lightblue')
         ui.separator()
         auto_hide = ui.checkbox("自动隐藏", value=False)
 
