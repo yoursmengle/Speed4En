@@ -270,17 +270,17 @@ with ui.row().style("height:auto;width:auto"):
         text_cn_2.set_visibility(False)
 
         with ui.row():
-            ui.button("生成", icon='history', on_click=on_gen_cn, color='lightgreen')
-            ui.button("隐藏", icon='lock', on_click=on_cn_disappear, color='lightgreen')
-            ui.button("显示", icon='visibility', on_click=on_cn_display, color='lightgreen')
-            ui.button("清空", icon='clear', on_click=lambda: text_cn.set_value(''), color='lightgreen')
+            ui.button("生成", icon='history', on_click=on_gen_cn, color='green')
+            ui.button("隐藏", icon='lock', on_click=on_cn_disappear, color='green')
+            ui.button("显示", icon='visibility', on_click=on_cn_display, color='green')
+            ui.button("清空", icon='clear', on_click=lambda: text_cn.set_value(''), color='green')
 
     with ui.column():
         ui.html('<center>翻   译</center>').style('color: #6E93D6; font-size: 150%; font-weight: 300').classes('w-full')
-        ui.button(icon='arrow_forward', on_click=on_translate_c2e, color='lightblue').classes('w-full')
-        ui.button(icon='arrow_back', on_click=on_translate_e2c, color='lightgreen').classes('w-full')
+        ui.button(icon='arrow_forward', on_click=on_translate_c2e, color='blue').classes('w-full')
+        ui.button(icon='arrow_back', on_click=on_translate_e2c, color='green').classes('w-full')
         ui.separator()
-        ui.button("保存", icon='save', on_click=on_save, color='lightblue')
+        ui.button("保存", icon='save', on_click=on_save, color='blue')
         ui.separator()
         auto_hide = ui.checkbox("自动隐藏", value=False)
 
@@ -292,10 +292,10 @@ with ui.row().style("height:auto;width:auto"):
         text_en_2.set_visibility(False)
 
         with ui.row():
-            ui.button("生成", icon='history', on_click=on_gen_en, color='lightblue')
-            ui.button("隐藏", icon='lock', on_click=on_en_disappear, color='lightblue')
-            ui.button("显示", icon='visibility', on_click=on_en_display, color='lightblue')
-            ui.button("清空", icon='clear', on_click=lambda: text_en.set_value(''), color='lightblue')
+            ui.button("生成", icon='history', on_click=on_gen_en, color='blue')
+            ui.button("隐藏", icon='lock', on_click=on_en_disappear, color='blue')
+            ui.button("显示", icon='visibility', on_click=on_en_display, color='blue')
+            ui.button("清空", icon='clear', on_click=lambda: text_en.set_value(''), color='blue')
 
 ui.separator()
 
@@ -305,10 +305,10 @@ with ui.card().classes('no-shadow border-[3px]'):
         ui.space()
         ui.space()
         ui.space()
-        b1 = ui.button("1倍速播放", icon='play_circle', on_click=lambda: on_play(1), color='lightblue')
-        b2 = ui.button("2倍速播放", icon='play_circle', on_click=lambda: on_play(2), color='lightblue')
-        b3 = ui.button("3倍速播放", icon='play_circle', on_click=lambda: on_play(3), color='lightblue')
-        b4 = ui.button("4倍速播放", icon='play_circle', on_click=lambda: on_play(4), color='lightblue')
+        b1 = ui.button("1倍速播放", icon='play_circle', on_click=lambda: on_play(1), color='blue')
+        b2 = ui.button("2倍速播放", icon='play_circle', on_click=lambda: on_play(2), color='blue')
+        b3 = ui.button("3倍速播放", icon='play_circle', on_click=lambda: on_play(3), color='blue')
+        b4 = ui.button("4倍速播放", icon='play_circle', on_click=lambda: on_play(4), color='blue')
         ui.space()
         ui.space()
         ui.space()
@@ -330,7 +330,7 @@ ui.run(
     native = True,  # 本地运行，不使用浏览器   
     title  = "四倍速英语听力训练 v0.1.0",  # 窗口标题
     reload = False,
-    dark   = False,
+    dark   = True,
     window_size = (1800, 1200),
     fullscreen = False,
     favicon = './favicon.ico', # 自定义图标
