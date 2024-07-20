@@ -202,6 +202,8 @@ def highlight_differences(text1, text2):
 def on_check():
     try:
         if text_en.value == "" or text_writing.value == "":
+            result.set_content("")
+            result.update()            
             ui.notify("请确保两个文本框都有内容")
             return
     
@@ -248,8 +250,6 @@ def on_save():
     ui.notify("保存成功")
 
 # main 
-ui.markdown("## 四倍速英语听力训练 v0.1.0")
-ui.separator()
 
 examples_cn = []
 examples_en = []
@@ -262,7 +262,7 @@ with open('examples_en.txt', 'r', encoding='utf-8') as f:
     examples_en = f.readlines()
 
 with ui.row().style("height:auto;width:auto"):
-    with ui.card():
+    with ui.card().classes('no-shadow border-[3px]'):
         ui.markdown("中文文本")
         ui.separator()
         text_cn = ui.textarea("输入中文文本").classes('w-full').props('clearable')
@@ -276,7 +276,7 @@ with ui.row().style("height:auto;width:auto"):
             ui.button("清空", icon='clear', on_click=lambda: text_cn.set_value(''), color='lightgreen')
 
     with ui.column():
-        ui.html('<center>翻   译</center>').classes('w-full')
+        ui.html('<center>翻   译</center>').style('color: #6E93D6; font-size: 150%; font-weight: 300').classes('w-full')
         ui.button(icon='arrow_forward', on_click=on_translate_c2e, color='lightblue').classes('w-full')
         ui.button(icon='arrow_back', on_click=on_translate_e2c, color='lightgreen').classes('w-full')
         ui.separator()
@@ -284,7 +284,7 @@ with ui.row().style("height:auto;width:auto"):
         ui.separator()
         auto_hide = ui.checkbox("自动隐藏", value=False)
 
-    with ui.card():
+    with ui.card().classes('no-shadow border-[3px]'):
         ui.markdown("英文文本")
         ui.separator()
         text_en = ui.textarea("输入英文文本").classes('w-full').props('clearable')
@@ -296,28 +296,31 @@ with ui.row().style("height:auto;width:auto"):
             ui.button("隐藏", icon='lock', on_click=on_en_disappear, color='lightblue')
             ui.button("显示", icon='visibility', on_click=on_en_display, color='lightblue')
             ui.button("清空", icon='clear', on_click=lambda: text_en.set_value(''), color='lightblue')
-ui.separator()
-
-
-with ui.row():
-    ui.button("生成英文语音", icon='audio_file', on_click=on_generate, color='green')
-    ui.space()
-    ui.space()
-    ui.space()
-    b1 = ui.button("1倍速播放", icon='play_circle', on_click=lambda: on_play(1), color='lightblue')
-    b2 = ui.button("2倍速播放", icon='play_circle', on_click=lambda: on_play(2), color='lightblue')
-    b3 = ui.button("3倍速播放", icon='play_circle', on_click=lambda: on_play(3), color='lightblue')
-    b4 = ui.button("4倍速播放", icon='play_circle', on_click=lambda: on_play(4), color='lightblue')
-    ui.space()
-    ui.space()
-    ui.space()
-    ui.button("听写检查", icon='check', on_click=on_check, color='green')
 
 ui.separator()
-text_writing = ui.textarea("听写区域").classes('w-full').props('clearable')
-result = ui.markdown("")
+
+with ui.card().classes('no-shadow border-[3px]'):
+    with ui.row():
+        ui.button("生成英文语音", icon='audio_file', on_click=on_generate, color='green')
+        ui.space()
+        ui.space()
+        ui.space()
+        b1 = ui.button("1倍速播放", icon='play_circle', on_click=lambda: on_play(1), color='lightblue')
+        b2 = ui.button("2倍速播放", icon='play_circle', on_click=lambda: on_play(2), color='lightblue')
+        b3 = ui.button("3倍速播放", icon='play_circle', on_click=lambda: on_play(3), color='lightblue')
+        b4 = ui.button("4倍速播放", icon='play_circle', on_click=lambda: on_play(4), color='lightblue')
+        ui.space()
+        ui.space()
+        ui.space()
+        ui.button("听写检查", icon='check', on_click=on_check, color='green')
+    
+    ui.separator()
+    text_writing = ui.textarea("听写区域").classes('w-full').props('clearable').style('color: #6E93D6; font-size: 150%; font-weight: 300')
+    result = ui.markdown("")
+
 ui.separator()
 
+# 用于用户输入翻译API的URL
 url_trans = ui.input("翻译api").classes('w-full')
 url_trans.value = TRANSLATE_API_URL
 url_tts = ui.input("TTS api").classes('w-full')
@@ -325,7 +328,7 @@ url_tts.value = TTS_API_URL
 
 ui.run(
     native = True,  # 本地运行，不使用浏览器   
-    title  = "speed4 v0.1.0",  # 窗口标题
+    title  = "四倍速英语听力训练 v0.1.0",  # 窗口标题
     reload = False,
     dark   = False,
     window_size = (1800, 1200),
