@@ -285,55 +285,51 @@ with open('examples_en.txt', 'r', encoding='utf-8') as f:
 
 with ui.row().style("height:auto;width:auto"):
     with ui.card().classes('no-shadow border-[3px]'):
-        ui.markdown("中文文本")
-        ui.separator()
-        text_cn = ui.textarea("输入中文文本").classes('w-full').props('clearable')
-        text_cn_2 = ui.textarea("输入中文文本").classes('w-full')
+        text_cn = ui.textarea("输入中文文本,或点击“历史”").classes('w-full').props('clearable')
+        text_cn_2 = ui.textarea("输入中文文本,或点击“历史”").classes('w-full')
         text_cn_2.set_visibility(False)
 
         with ui.row():
-            ui.button("历史", icon='history', on_click=on_sel_cn, color='green')
-            ui.button("隐藏", icon='lock', on_click=on_cn_disappear, color='green')
-            ui.button("显示", icon='visibility', on_click=on_cn_display, color='green')
-            ui.button("清空", icon='clear', on_click=lambda: text_cn.set_value(''), color='green')
+            ui.button("历史", icon='history', on_click=on_sel_cn, color='blue')
+            ui.button("隐藏", icon='lock', on_click=on_cn_disappear, color='blue')
+            ui.button("显示", icon='visibility', on_click=on_cn_display, color='blue')
+            ui.button("清空", icon='clear', on_click=lambda: text_cn.set_value(''), color='blue')
 
     with ui.column():
         with ui.card():
             ui.html('<center>翻   译</center>').style('color: #6E93D6; font-size: 150%; font-weight: 300').classes('w-full')
-            ui.button(icon='arrow_forward', on_click=on_translate_c2e, color='blue').classes('w-full')
-            ui.button(icon='arrow_back', on_click=on_translate_e2c, color='green').classes('w-full')
-        ui.button("保存", icon='save', on_click=on_save, color='blue')
+            ui.button(icon='arrow_forward', on_click=on_translate_c2e, color='darkblue').classes('w-full')
+            ui.button(icon='arrow_back', on_click=on_translate_e2c, color='blue').classes('w-full')
+        ui.button("保存", icon='save', on_click=on_save, color='darkblue')
         ui.separator()
         auto_hide = ui.checkbox("自动隐藏", value=False)
 
     with ui.card().classes('no-shadow border-[3px]'):
-        ui.markdown("英文文本")
-        ui.separator()
-        text_en = ui.textarea("输入英文文本").classes('w-full').props('clearable')
-        text_en_2 = ui.textarea("输入英文文本").classes('w-full')
+        text_en = ui.textarea("输入英文文本，或点击“随机”或“历史”").classes('w-full').props('clearable')
+        text_en_2 = ui.textarea("输入英文文本，或点击“随机”或“历史”").classes('w-full')
         text_en_2.set_visibility(False)
 
         with ui.row():
-            ui.button("随机", icon='shuffle', on_click=on_gen_en, color='blue')
-            ui.button("历史", icon='history', on_click=on_sel_en, color='blue')
-            ui.button("隐藏", icon='lock', on_click=on_en_disappear, color='blue')
-            ui.button("显示", icon='visibility', on_click=on_en_display, color='blue')
-            ui.button("清空", icon='clear', on_click=lambda: text_en.set_value(''), color='blue')
+            ui.button("随机", icon='shuffle', on_click=on_gen_en, color='darkblue')
+            ui.button("历史", icon='history', on_click=on_sel_en, color='darkblue')
+            ui.button("隐藏", icon='lock', on_click=on_en_disappear, color='darkblue')
+            ui.button("显示", icon='visibility', on_click=on_en_display, color='darkblue')
+            ui.button("清空", icon='clear', on_click=lambda: text_en.set_value(''), color='darkblue')
 
 with ui.card().classes('no-shadow border-[3px] items-center'):
     with ui.row():
-        ui.button("生成英文语音", icon='audio_file', on_click=on_generate, color='green')
+        ui.button("生成英文语音", icon='audio_file', on_click=on_generate, color='blue')
         ui.space()
         ui.space()
         ui.space()
-        b1 = ui.button("1倍速播放", icon='play_circle', on_click=lambda: on_play(1), color='blue')
-        b2 = ui.button("2倍速播放", icon='play_circle', on_click=lambda: on_play(2), color='blue')
-        b3 = ui.button("3倍速播放", icon='play_circle', on_click=lambda: on_play(3), color='blue')
-        b4 = ui.button("4倍速播放", icon='play_circle', on_click=lambda: on_play(4), color='blue')
+        b1 = ui.button("1倍速播放", icon='play_circle', on_click=lambda: on_play(1), color='darkblue')
+        b2 = ui.button("2倍速播放", icon='play_circle', on_click=lambda: on_play(2), color='darkblue')
+        b3 = ui.button("3倍速播放", icon='play_circle', on_click=lambda: on_play(3), color='darkblue')
+        b4 = ui.button("4倍速播放", icon='play_circle', on_click=lambda: on_play(4), color='darkblue')
         ui.space()
         ui.space()
         ui.space()
-        ui.button("听写检查", icon='check', on_click=on_check, color='green')
+        ui.button("听写检查", icon='check', on_click=on_check, color='blue')
 
     vol = ui.slider(value=50, min=0, max=100, step=1.0, on_change=on_volume).classes('w-full')
     
