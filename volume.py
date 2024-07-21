@@ -26,5 +26,4 @@ def vol_tansfer(x):
 def set_vol(vol):
     global volume
     db = vol_tansfer(vol)
-    print("db: ", db)   
     volume.SetMasterVolumeLevel(db, None)

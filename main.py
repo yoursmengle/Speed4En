@@ -313,6 +313,10 @@ with ui.row().style("height:auto;width:auto"):
             ui.button("隐藏", icon='lock', on_click=on_cn_disappear, color='blue')
             ui.button("显示", icon='visibility', on_click=on_cn_display, color='blue')
 
+    with ui.card(): 
+        ui.label("音量调节")
+        vol = ui.slider(value=50, min=0, max=100, step=1.0, on_change=on_volume)
+    
 with ui.card().classes('no-shadow border-[3px] items-center'):
     with ui.row():
         ui.button("生成英文语音", icon='audio_file', on_click=on_generate, color='blue')
@@ -328,8 +332,6 @@ with ui.card().classes('no-shadow border-[3px] items-center'):
         ui.space()
         ui.button("听写检查", icon='check', on_click=on_check, color='blue')
 
-    vol = ui.slider(value=50, min=0, max=100, step=1.0, on_change=on_volume).classes('w-full')
-    
     ui.separator()
     text_writing = ui.textarea("听写区域").classes('w-full').props('clearable').style('color: #6E93D6; font-size: 150%; font-weight: 300')
     result = ui.markdown("")
