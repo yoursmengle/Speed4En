@@ -6,6 +6,9 @@ import shutil
 import os
 from datetime import datetime
 import difflib
+import win32api
+import win32con
+import volume
 
 #from niceguiToolkit.layout import inject_layout_tool
 #inject_layout_tool()
@@ -157,7 +160,7 @@ def on_play(speed):
         player.pause()
         player.set_source(audio_files[speed])
         player.update()
-    
+
     # need to destroy the player after using, cannot find the method yet
     player.play()
 
@@ -263,6 +266,11 @@ def on_save():
 
     ui.notify("保存成功")
 
+
+def on_volume():
+    value = int(vol.value)
+    volume.set_vol(value)
+
 # main 
 
 examples_cn = []
@@ -290,10 +298,10 @@ with ui.row().style("height:auto;width:auto"):
             ui.button("清空", icon='clear', on_click=lambda: text_cn.set_value(''), color='green')
 
     with ui.column():
-        ui.html('<center>翻   译</center>').style('color: #6E93D6; font-size: 150%; font-weight: 300').classes('w-full')
-        ui.button(icon='arrow_forward', on_click=on_translate_c2e, color='blue').classes('w-full')
-        ui.button(icon='arrow_back', on_click=on_translate_e2c, color='green').classes('w-full')
-        ui.separator()
+        with ui.card():
+            ui.html('<center>翻   译</center>').style('color: #6E93D6; font-size: 150%; font-weight: 300').classes('w-full')
+            ui.button(icon='arrow_forward', on_click=on_translate_c2e, color='blue').classes('w-full')
+            ui.button(icon='arrow_back', on_click=on_translate_e2c, color='green').classes('w-full')
         ui.button("保存", icon='save', on_click=on_save, color='blue')
         ui.separator()
         auto_hide = ui.checkbox("自动隐藏", value=False)
@@ -312,9 +320,7 @@ with ui.row().style("height:auto;width:auto"):
             ui.button("显示", icon='visibility', on_click=on_en_display, color='blue')
             ui.button("清空", icon='clear', on_click=lambda: text_en.set_value(''), color='blue')
 
-ui.separator()
-
-with ui.card().classes('no-shadow border-[3px]'):
+with ui.card().classes('no-shadow border-[3px] items-center'):
     with ui.row():
         ui.button("生成英文语音", icon='audio_file', on_click=on_generate, color='green')
         ui.space()
@@ -328,10 +334,13 @@ with ui.card().classes('no-shadow border-[3px]'):
         ui.space()
         ui.space()
         ui.button("听写检查", icon='check', on_click=on_check, color='green')
+
+    vol = ui.slider(value=50, min=0, max=100, step=1.0, on_change=on_volume).classes('w-full')
     
     ui.separator()
     text_writing = ui.textarea("听写区域").classes('w-full').props('clearable').style('color: #6E93D6; font-size: 150%; font-weight: 300')
     result = ui.markdown("")
+
 
 ui.separator()
 
