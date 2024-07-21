@@ -285,26 +285,6 @@ with open('examples_en.txt', 'r', encoding='utf-8') as f:
 
 with ui.row().style("height:auto;width:auto"):
     with ui.card().classes('no-shadow border-[3px]'):
-        text_cn = ui.textarea("输入中文文本,或点击“历史”").classes('w-full').props('clearable')
-        text_cn_2 = ui.textarea("输入中文文本,或点击“历史”").classes('w-full')
-        text_cn_2.set_visibility(False)
-
-        with ui.row():
-            ui.button("历史", icon='history', on_click=on_sel_cn, color='blue')
-            ui.button("隐藏", icon='lock', on_click=on_cn_disappear, color='blue')
-            ui.button("显示", icon='visibility', on_click=on_cn_display, color='blue')
-            ui.button("清空", icon='clear', on_click=lambda: text_cn.set_value(''), color='blue')
-
-    with ui.column():
-        with ui.card():
-            ui.html('<center>翻   译</center>').style('color: #6E93D6; font-size: 150%; font-weight: 300').classes('w-full')
-            ui.button(icon='arrow_forward', on_click=on_translate_c2e, color='darkblue').classes('w-full')
-            ui.button(icon='arrow_back', on_click=on_translate_e2c, color='blue').classes('w-full')
-        ui.button("保存", icon='save', on_click=on_save, color='darkblue')
-        ui.separator()
-        auto_hide = ui.checkbox("自动隐藏", value=False)
-
-    with ui.card().classes('no-shadow border-[3px]'):
         text_en = ui.textarea("输入英文文本，或点击“随机”或“历史”").classes('w-full').props('clearable')
         text_en_2 = ui.textarea("输入英文文本，或点击“随机”或“历史”").classes('w-full')
         text_en_2.set_visibility(False)
@@ -314,7 +294,24 @@ with ui.row().style("height:auto;width:auto"):
             ui.button("历史", icon='history', on_click=on_sel_en, color='darkblue')
             ui.button("隐藏", icon='lock', on_click=on_en_disappear, color='darkblue')
             ui.button("显示", icon='visibility', on_click=on_en_display, color='darkblue')
-            ui.button("清空", icon='clear', on_click=lambda: text_en.set_value(''), color='darkblue')
+
+    with ui.column():
+        with ui.card():
+            #ui.html('<center>翻   译</center>').style('color: #6E93D6; font-size: 150%; font-weight: 300').classes('w-full')
+            ui.button(icon='arrow_forward', on_click=on_translate_e2c, color='darkblue').classes('w-full')
+            ui.button(icon='arrow_back', on_click=on_translate_c2e, color='blue').classes('w-full')
+        ui.button("保存", icon='save', on_click=on_save, color='darkblue')
+        auto_hide = ui.checkbox("自动隐藏", value=False)
+
+    with ui.card().classes('no-shadow border-[3px]'):
+        text_cn = ui.textarea("输入中文文本,或点击“历史”").classes('w-full').props('clearable')
+        text_cn_2 = ui.textarea("输入中文文本,或点击“历史”").classes('w-full')
+        text_cn_2.set_visibility(False)
+
+        with ui.row():
+            ui.button("历史", icon='history', on_click=on_sel_cn, color='blue')
+            ui.button("隐藏", icon='lock', on_click=on_cn_disappear, color='blue')
+            ui.button("显示", icon='visibility', on_click=on_cn_display, color='blue')
 
 with ui.card().classes('no-shadow border-[3px] items-center'):
     with ui.row():
