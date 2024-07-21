@@ -23,6 +23,9 @@ TTS_API_URL = "https://api.streamelements.com/kappa/v2/speech"
 # 使用免费的翻译API
 TRANSLATE_API_URL = "https://api.mymemory.translated.net/get"
 
+# 获取英文句子的API
+QUOTABLE_API = "https://api.quotable.io/random?minLength=80&tags=life"
+
 def generate_speech(text):
     params = {
         "voice": "Brian",
@@ -229,12 +232,23 @@ def on_check():
 
 # on_check()
 
-def on_gen_cn():
+def on_sel_cn():
     text_cn.set_value(examples_cn[datetime.now().microsecond%len(examples_cn)])
     on_cn_display()
 
 def on_gen_en():
+    response = requests.get(url_sts.value)
+    if response.status_code == 200:
+        data = response.json()
+        text_en.value = data["content"] 
+        on_en_display()
+        ui.notify("获取英文句子成功")
+    else:
+        ui.notify("获取英文句子失败")
+
+def on_sel_en():
     text_en.set_value(examples_en[datetime.now().microsecond%len(examples_en)])
+    on_en_display()
 
 def on_save():
     if text_cn.value == "" and text_en.value == "":
@@ -270,7 +284,7 @@ with ui.row().style("height:auto;width:auto"):
         text_cn_2.set_visibility(False)
 
         with ui.row():
-            ui.button("生成", icon='history', on_click=on_gen_cn, color='green')
+            ui.button("历史", icon='history', on_click=on_sel_cn, color='green')
             ui.button("隐藏", icon='lock', on_click=on_cn_disappear, color='green')
             ui.button("显示", icon='visibility', on_click=on_cn_display, color='green')
             ui.button("清空", icon='clear', on_click=lambda: text_cn.set_value(''), color='green')
@@ -292,7 +306,8 @@ with ui.row().style("height:auto;width:auto"):
         text_en_2.set_visibility(False)
 
         with ui.row():
-            ui.button("生成", icon='history', on_click=on_gen_en, color='blue')
+            ui.button("随机", icon='shuffle', on_click=on_gen_en, color='blue')
+            ui.button("历史", icon='history', on_click=on_sel_en, color='blue')
             ui.button("隐藏", icon='lock', on_click=on_en_disappear, color='blue')
             ui.button("显示", icon='visibility', on_click=on_en_display, color='blue')
             ui.button("清空", icon='clear', on_click=lambda: text_en.set_value(''), color='blue')
@@ -321,9 +336,11 @@ with ui.card().classes('no-shadow border-[3px]'):
 ui.separator()
 
 # 用于用户输入翻译API的URL
+url_sts = ui.input("英语句子api").classes('w-full')
+url_sts.value = QUOTABLE_API
 url_trans = ui.input("翻译api").classes('w-full')
 url_trans.value = TRANSLATE_API_URL
-url_tts = ui.input("TTS api").classes('w-full')
+url_tts = ui.input("语音api").classes('w-full')
 url_tts.value = TTS_API_URL
 
 ui.run(
@@ -331,7 +348,7 @@ ui.run(
     title  = "四倍速英语听力训练 v0.1.0",  # 窗口标题
     reload = False,
     dark   = True,
-    window_size = (1800, 1200),
+    window_size = (1920, 1080),
     fullscreen = False,
     favicon = './favicon.ico', # 自定义图标
 )       
