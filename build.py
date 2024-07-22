@@ -17,7 +17,7 @@ import coincurve
 script = f''' \
     python -m PyInstaller main.py \
     -i favicon.ico \
-    -n speed4 \
+    -n speed4en \
     -F \
     -w \
     --add-data="{Path(nicegui.__file__).parent}{os.pathsep}nicegui" \
