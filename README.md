@@ -1,4 +1,13 @@
-# 安装说明
+# 四倍速英语听力训练 
+
+## 0. 简介
+
+本项目是一个英语听力训练工具，能够自动从网络获取听力材料，生成语音并已不同语速播放，提高听力训练效率。
+本项目基于python下的nicegui开发，暂时只支持windows系统。
+
+## 1. 使用方法
+
+
 
 ## 1. 安装依赖
 
@@ -18,7 +27,7 @@ wget https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-essentials.7z
 
 ## 2. 运行
 ```bash
-python main.py
+./running.ps1
 ```
 
 
