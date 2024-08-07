@@ -9,6 +9,10 @@ import difflib
 import win32api
 import win32con
 import volume
+import sounddevice as sd
+import wave
+import numpy as np
+import pyaudio
 
 #from niceguiToolkit.layout import inject_layout_tool
 #inject_layout_tool()
@@ -270,6 +274,37 @@ def on_save():
 def on_volume():
     value = int(vol.value)
     volume.set_vol(value)
+
+# Define global variables for recording
+fs = 44100  # Sample rate
+duration = 10  # Duration of recording in seconds
+recording = None
+
+def start_recording():
+    global recording
+    recording = sd.rec(int(duration * fs), samplerate=fs, channels=2, dtype='int16')
+    sd.wait()  # Wait until recording is finished
+
+def stop_recording(filename='output.wav'):
+    global recording
+    if recording is not None:
+        with wave.open(filename, 'w') as wf:
+            wf.setnchannels(2)
+            wf.setsampwidth(2)
+            wf.setframerate(fs)
+            wf.writeframes(recording.tobytes())
+        recording = None
+
+
+btn_state = {'state': False}
+def on_record():
+    if btn_state['state'] == False:
+        btn_state['state'] = True
+        ui.notify("开始录音")
+
+    else:
+        btn_state['state'] = False
+        ui.notify("录音结束")
 
 # main 
 

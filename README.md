@@ -26,8 +26,8 @@
 ### 安装依赖包
 ```bash
 python -m venv venv
-source venv/Scripts/activate
-pip install -r requirements.txt
+venv/Scripts/activate.ps1
+python -m pip install -r requirements.txt
 ```
 
 ### 安装 ffmpeg
