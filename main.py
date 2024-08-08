@@ -21,7 +21,11 @@ import pyaudio
 player = None
 
 t = 1 # generate counter
-audio_files = ["0.mp3", "1.mp3", "2.mp3", "3.mp3", "4.mp3"] # 0.mp3 is a file for placeholder
+
+# 0.mp3 is a file for placeholder
+# 1~4.mp3 are generated audio files
+# 5.wav is the recorded audio file
+audio_files = ["0.mp3", "1.mp3", "2.mp3", "3.mp3", "4.mp3", "5.wav"] 
 audio_ok = False
 
 # 使用免费的Text-to-Speech API
@@ -75,6 +79,7 @@ def on_generate():
     audio_files[2] = f"{t}2.mp3"
     audio_files[3] = f"{t}3.mp3"
     audio_files[4] = f"{t}4.mp3"
+    audio_files[5] = f"{t}5.wav"
 
     # 保存原始语音文件到本地目录，文件名为audio.mp3
     try:
@@ -144,7 +149,10 @@ def on_translate_e2c():
         data = response.json()
         translated_text = data["responseData"]["translatedText"]
         text_cn.value = translated_text
-        on_cn_display()
+        if auto_hide.value:
+            on_cn_disappear()
+        else:
+            on_cn_display()
         ui.notify("翻译完成")
     else:
         ui.notify("翻译失败")
@@ -241,21 +249,30 @@ def on_check():
 
 def on_sel_cn():
     text_cn.set_value(examples_cn[datetime.now().microsecond%len(examples_cn)])
-    on_cn_display()
+    if auto_hide.value:
+        on_cn_disappear()
+    else:
+        on_cn_display()
 
 def on_gen_en():
     response = requests.get(url_sts.value)
     if response.status_code == 200:
         data = response.json()
         text_en.value = data["content"] 
-        on_en_display()
+        if auto_hide.value:
+            on_en_disappear()
+        else:
+            on_en_display()
         ui.notify("获取英文句子成功")
     else:
         ui.notify("获取英文句子失败")
 
 def on_sel_en():
     text_en.set_value(examples_en[datetime.now().microsecond%len(examples_en)])
-    on_en_display()
+    if auto_hide.value: 
+        on_en_disappear()
+    else:
+        on_en_display()
 
 def on_save():
     if text_cn.value == "" and text_en.value == "":
@@ -295,16 +312,54 @@ def stop_recording(filename='output.wav'):
             wf.writeframes(recording.tobytes())
         recording = None
 
+# Define global variables for recording
+fs = 44100  # Sample rate
+channels = 2  # Number of audio channels
+format = pyaudio.paInt16  # Sample format
+chunk = 1024  # Chunk size
+recording = []
+stream = None
+audio = pyaudio.PyAudio()
 
-btn_state = {'state': False}
+def start_recording():
+    global stream, recording
+    stream = audio.open(format=format, channels=channels, rate=fs, input=True, frames_per_buffer=chunk)
+    print("stream: ", stream)
+    recording = []
+    stream.start_stream()
+    print("Recording started...")
+
+def stop_recording(filename='output.wav'):
+    global stream, recording
+    print("Recording stopped.")
+    stream.stop_stream()
+    stream.close()
+    audio.terminate()
+    print("audio: ", audio)
+
+    if not recording:
+        print("No audio recorded. File not saved.")
+        return
+
+    wf = wave.open(filename, 'wb')
+    wf.setnchannels(channels)
+    wf.setsampwidth(audio.get_sample_size(format))
+    wf.setframerate(fs)
+    wf.writeframes(b''.join(recording))
+    wf.close()
+    print(f"File saved as {filename}")
+
+def record_callback(in_data, frame_count, time_info, status):
+    recording.append(in_data)
+    return (in_data, pyaudio.paContinue)
+
 def on_record():
-    if btn_state['state'] == False:
-        btn_state['state'] = True
-        ui.notify("开始录音")
+    start_recording()
+    ui.notify("开始录音")
 
-    else:
-        btn_state['state'] = False
-        ui.notify("录音结束")
+def on_record_stop():
+    stop_recording('5.wav')
+    ui.notify("录音结束")
 
 # main 
 
@@ -357,19 +412,21 @@ with ui.card().classes('no-shadow border-[3px] items-center'):
         ui.button("生成英文语音", icon='audio_file', on_click=on_generate, color='blue')
         ui.space()
         ui.space()
-        ui.space()
         b1 = ui.button("1倍速播放", icon='play_circle', on_click=lambda: on_play(1), color='darkblue')
         b2 = ui.button("2倍速播放", icon='play_circle', on_click=lambda: on_play(2), color='darkblue')
         b3 = ui.button("3倍速播放", icon='play_circle', on_click=lambda: on_play(3), color='darkblue')
         b4 = ui.button("4倍速播放", icon='play_circle', on_click=lambda: on_play(4), color='darkblue')
         ui.space()
         ui.space()
-        ui.space()
-        ui.button("听写检查", icon='check', on_click=on_check, color='blue')
+        bRecord = ui.button("录音", icon='mic', on_click=on_record, color='darkblue')
+        bStop = ui.button("停止", icon='stop', on_click=on_record_stop, color='darkblue')
+        bPlay = ui.button("播放", icon='play_circle', on_click=lambda: on_play(5), color='darkblue')
 
-    ui.separator()
-    text_writing = ui.textarea("听写区域").classes('w-full').props('clearable').style('color: #6E93D6; font-size: 150%; font-weight: 300')
-    result = ui.markdown("")
+with ui.card().classes('no-shadow border-[3px]'):
+    with ui.row():
+        text_writing = ui.textarea("听写区域").props('clearable').style('color: #6E93D6; font-size: 150%; font-weight: 300; width: 600px')
+        result = ui.markdown("")
+        ui.button("听写检查", icon='check', on_click=on_check, color='blue')
 
 
 ui.separator()
@@ -409,10 +466,10 @@ def on_reset_tts():
     ui.notify("恢复默认")
     on_save_tts()
 
-# 用于用户输入翻译API的URL力
+# 用于用户输入翻译API的URL
 with ui.card().style('width: 100%'):
     with ui.row():
-        url_sts = ui.input("英语句子api").style('width: 600')
+        url_sts = ui.input("英语句子api").style('width: 600px')
         if os.path.exists("url_sts.txt"):
             url_sts.value = read_string_from_file("url_sts.txt")
         else:
@@ -421,7 +478,7 @@ with ui.card().style('width: 100%'):
         ui.button("恢复默认", icon='history', on_click=on_reset_eng, color='darkblue')
 
     with ui.row():
-        url_trans = ui.input("翻译api").style('width:2/3')
+        url_trans = ui.input("翻译api").style('width: 600px')
         if os.path.exists("url_trans.txt"):
             url_trans.value = read_string_from_file("url_trans.txt")
         else:
@@ -430,7 +487,7 @@ with ui.card().style('width: 100%'):
         ui.button("恢复默认", icon='history', on_click=on_reset_trans, color='darkblue')
 
     with ui.row():
-        url_tts = ui.input("语音api").style('width: 600')
+        url_tts = ui.input("语音api").style('width: 600px')
         if os.path.exists("url_tts.txt"):
             url_tts.value = read_string_from_file("url_tts.txt")
         else:
