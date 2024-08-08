@@ -374,17 +374,73 @@ with ui.card().classes('no-shadow border-[3px] items-center'):
 
 ui.separator()
 
-# 用于用户输入翻译API的URL
-url_sts = ui.input("英语句子api").classes('w-full')
-url_sts.value = QUOTABLE_API
-url_trans = ui.input("翻译api").classes('w-full')
-url_trans.value = TRANSLATE_API_URL
-url_tts = ui.input("语音api").classes('w-full')
-url_tts.value = TTS_API_URL
+def save_string_to_file(filename, content):
+    with open(filename, 'w', encoding='utf-8') as f:
+        f.write(content)
+
+def read_string_from_file(filename):
+    with open (filename, 'r', encoding='utf-8') as f:
+        return f.read()
+
+def on_save_eng():
+    save_string_to_file("url_sts.txt", url_sts.value)
+    ui.notify("保存成功")
+
+def on_reset_eng():
+    url_sts.value = QUOTABLE_API
+    ui.notify("恢复默认")
+    on_save_eng()
+
+def on_save_trans():
+    save_string_to_file("url_trans.txt", url_trans.value)
+    ui.notify("保存成功")
+
+def on_reset_trans():
+    url_trans.value = TRANSLATE_API_URL
+    ui.notify("恢复默认")
+    on_save_trans()
+
+def on_save_tts():
+    save_string_to_file("url_tts.txt", url_tts.value)
+    ui.notify("保存成功")
+
+def on_reset_tts():
+    url_tts.value = TTS_API_URL
+    ui.notify("恢复默认")
+    on_save_tts()
+
+# 用于用户输入翻译API的URL力
+with ui.card().style('width: 100%'):
+    with ui.row():
+        url_sts = ui.input("英语句子api").style('width: 600')
+        if os.path.exists("url_sts.txt"):
+            url_sts.value = read_string_from_file("url_sts.txt")
+        else:
+            url_sts.value = QUOTABLE_API
+        ui.button("保存", icon='save', on_click=on_save_eng, color='darkblue')
+        ui.button("恢复默认", icon='history', on_click=on_reset_eng, color='darkblue')
+
+    with ui.row():
+        url_trans = ui.input("翻译api").style('width:2/3')
+        if os.path.exists("url_trans.txt"):
+            url_trans.value = read_string_from_file("url_trans.txt")
+        else:
+            url_trans.value = TRANSLATE_API_URL
+        ui.button("保存", icon='save', on_click=on_save_trans, color='darkblue')
+        ui.button("恢复默认", icon='history', on_click=on_reset_trans, color='darkblue')
+
+    with ui.row():
+        url_tts = ui.input("语音api").style('width: 600')
+        if os.path.exists("url_tts.txt"):
+            url_tts.value = read_string_from_file("url_tts.txt")
+        else:
+            url_tts.value = TTS_API_URL
+        ui.button("保存", icon='save', on_click=on_save_tts, color='darkblue')
+        ui.button("恢复默认", icon='history', on_click=on_reset_tts, color='darkblue')
 
 ui.run(
     native = True,  # 本地运行，不使用浏览器   
-    title  = "四倍速英语听力训练 v0.1.0",  # 窗口标题
+    title  = "四倍速英语 v0.1.0",  # 窗口标题
     reload = False,
     dark   = True,
     window_size = (1920, 1080),
