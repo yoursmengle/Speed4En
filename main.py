@@ -294,48 +294,37 @@ def on_volume():
 
 # Define global variables for recording
 fs = 44100  # Sample rate
-duration = 10  # Duration of recording in seconds
-recording = None
-
-def start_recording():
-    global recording
-    recording = sd.rec(int(duration * fs), samplerate=fs, channels=2, dtype='int16')
-    sd.wait()  # Wait until recording is finished
-
-def stop_recording(filename='output.wav'):
-    global recording
-    if recording is not None:
-        with wave.open(filename, 'w') as wf:
-            wf.setnchannels(2)
-            wf.setsampwidth(2)
-            wf.setframerate(fs)
-            wf.writeframes(recording.tobytes())
-        recording = None
-
-# Define global variables for recording
-fs = 44100  # Sample rate
 channels = 2  # Number of audio channels
 format = pyaudio.paInt16  # Sample format
 chunk = 1024  # Chunk size
 recording = []
 stream = None
-audio = pyaudio.PyAudio()
+pa = pyaudio.PyAudio()
+
+def record_callback(in_data, frame_count, time_info, status):
+    global recording
+    recording.append(in_data)
+    return (in_data, pyaudio.paContinue)
 
 def start_recording():
-    global stream, recording
-    stream = audio.open(format=format, channels=channels, rate=fs, input=True, frames_per_buffer=chunk)
-    print("stream: ", stream)
+    global stream, recording, pa 
+    stream = pa.open(format=format, 
+                    channels=channels, 
+                    rate=fs, 
+                    input=True, 
+                    frames_per_buffer=chunk,
+                    stream_callback=record_callback)
+
     recording = []
     stream.start_stream()
     print("Recording started...")
 
 def stop_recording(filename='output.wav'):
-    global stream, recording
+    global stream, recording, pa 
     print("Recording stopped.")
     stream.stop_stream()
     stream.close()
-    audio.terminate()
-    print("audio: ", audio)
+    pa.terminate()
 
     if not recording:
         print("No audio recorded. File not saved.")
@@ -343,23 +332,24 @@ def stop_recording(filename='output.wav'):
 
     wf = wave.open(filename, 'wb')
     wf.setnchannels(channels)
-    wf.setsampwidth(audio.get_sample_size(format))
+    wf.setsampwidth(pa.get_sample_size(format))
     wf.setframerate(fs)
     wf.writeframes(b''.join(recording))
     wf.close()
     print(f"File saved as {filename}")
 
-def record_callback(in_data, frame_count, time_info, status):
-    recording.append(in_data)
-    return (in_data, pyaudio.paContinue)
 
+flag_recording = False
 def on_record():
-    start_recording()
-    ui.notify("开始录音")
-
-def on_record_stop():
-    stop_recording('5.wav')
-    ui.notify("录音结束")
+    global flag_recording
+    if not flag_recording:
+        start_recording()
+        flag_recording = True
+        ui.notify("开始录音")
+    else:
+        stop_recording('5.wav')
+        flag_recording = False
+        ui.notify("录音结束")
 
 # main 
 
@@ -419,7 +409,11 @@ with ui.card().classes('no-shadow border-[3px] items-center'):
         ui.space()
         ui.space()
         bRecord = ui.button("录音", icon='mic', on_click=on_record, color='darkblue')
-        bStop = ui.button("停止", icon='stop', on_click=on_record_stop, color='darkblue')
+        if flag_recording:
+            bRecord.set_text("停止")
+        else:
+            bRecord.set_text("录音") 
+        
         bPlay = ui.button("播放", icon='play_circle', on_click=lambda: on_play(5), color='darkblue')
 
 with ui.card().classes('no-shadow border-[3px]'):
