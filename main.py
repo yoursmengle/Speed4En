@@ -14,18 +14,22 @@ import wave
 import numpy as np
 import pyaudio
 
-#from niceguiToolkit.layout import inject_layout_tool
-#inject_layout_tool()
+'''
+from niceguiToolkit.layout import inject_layout_tool
+inject_layout_tool()
+'''
 
 # audio file name: audio1.mp3, audio2.mp3, audio3.mp3, audio4.mp3
 player = None
 
 t = 1 # generate counter
+r = 1 # record counter
 
 # 0.mp3 is a file for placeholder
 # 1~4.mp3 are generated audio files
 # 5.wav is the recorded audio file
-audio_files = ["0.mp3", "1.mp3", "2.mp3", "3.mp3", "4.mp3", "5.wav"] 
+audio_files = ["0.mp3", "1.mp3", "2.mp3", "3.mp3", "4.mp3"] 
+record_file = "5.wav"
 audio_ok = False
 
 # 使用免费的Text-to-Speech API
@@ -79,7 +83,6 @@ def on_generate():
     audio_files[2] = f"{t}2.mp3"
     audio_files[3] = f"{t}3.mp3"
     audio_files[4] = f"{t}4.mp3"
-    audio_files[5] = f"{t}5.wav"
 
     # 保存原始语音文件到本地目录，文件名为audio.mp3
     try:
@@ -133,6 +136,21 @@ def on_translate_c2e():
     else:
         ui.notify("翻译失败")
 
+class RecordButton(ui.button):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.recording= False
+        self.on('click', self.toggle)
+
+    def toggle(self) -> None:
+        """Toggle the button state."""
+        self.recording = not self.recording
+        self.update()
+        on_record()
+
+    def update(self) -> None:
+        self.props(f'color={"red" if self.recording else "green"}')
+        super().update()
 
 def on_translate_e2c():
     text = text_en.value
@@ -156,6 +174,29 @@ def on_translate_e2c():
         ui.notify("翻译完成")
     else:
         ui.notify("翻译失败")
+
+rec_player = None
+
+def rec_play():
+    global record_file
+    global rec_player
+    
+    print("Playing recorded audio...", record_file)
+
+    if os.path.exists(record_file) == False:
+        ui.notify("请先录音")
+        return
+
+    if rec_player is None:
+        rec_player = ui.audio(record_file)
+        rec_player.set_visibility(False)
+    else:
+        rec_player.pause()
+        rec_player.set_source(record_file)
+        rec_player.update()
+    
+    rec_player.play()
+    print("Playing recorded audio succeed ...", record_file)
 
 def on_play(speed):
     global player
@@ -323,8 +364,8 @@ def stop_recording(filename='output.wav'):
     global stream, recording, pa 
     print("Recording stopped.")
     stream.stop_stream()
-    stream.close()
-    pa.terminate()
+    #stream.close()
+    pa.close(stream)
 
     if not recording:
         print("No audio recorded. File not saved.")
@@ -341,13 +382,18 @@ def stop_recording(filename='output.wav'):
 
 flag_recording = False
 def on_record():
+    global r 
     global flag_recording
+    global record_file
+
     if not flag_recording:
         start_recording()
         flag_recording = True
         ui.notify("开始录音")
     else:
-        stop_recording('5.wav')
+        r += 1
+        stop_recording(f"{r}.wav")
+        record_file = f"{r}.wav"
         flag_recording = False
         ui.notify("录音结束")
 
@@ -408,15 +454,11 @@ with ui.card().classes('no-shadow border-[3px] items-center'):
         b4 = ui.button("4倍速播放", icon='play_circle', on_click=lambda: on_play(4), color='darkblue')
         ui.space()
         ui.space()
-        bRecord = ui.button("录音", icon='mic', on_click=on_record, color='darkblue')
-        if flag_recording:
-            bRecord.set_text("停止")
-        else:
-            bRecord.set_text("录音") 
+        bRecord = RecordButton("录音", icon='mic') 
         
-        bPlay = ui.button("播放", icon='play_circle', on_click=lambda: on_play(5), color='darkblue')
+        bPlay = ui.button("播放", icon='play_circle', on_click=rec_play, color='darkblue')
 
-with ui.card().classes('no-shadow border-[3px]'):
+with ui.card().style("").classes('no-shadow border-[3px]'):
     with ui.row():
         text_writing = ui.textarea("听写区域").props('clearable').style('color: #6E93D6; font-size: 150%; font-weight: 300; width: 600px')
         result = ui.markdown("")
