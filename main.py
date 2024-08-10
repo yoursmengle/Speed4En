@@ -13,6 +13,10 @@ import sounddevice as sd
 import wave
 import numpy as np
 import pyaudio
+from pydub import AudioSegment
+from pydub.playback import play
+import noisereduce as nr
+import threading
 
 '''
 from niceguiToolkit.layout import inject_layout_tool
@@ -175,8 +179,26 @@ def on_translate_e2c():
     else:
         ui.notify("翻译失败")
 
-rec_player = None
+def noise_reduction(audiofile):
+    audio = AudioSegment.from_file(audiofile)
 
+    # reduce the noise of the recorded audio
+    samples = np.array(audio.get_array_of_samples())
+    rate = audio.frame_rate
+    reduced_noise = nr.reduce_noise(y=samples, sr=rate, )
+    audio = AudioSegment(data=reduced_noise.tobytes(), sample_width=audio.sample_width, frame_rate=rate, channels=audio.channels)
+    audio.export(audiofile, format="wav")
+
+def play_audio_as_daemon(audio):
+    def play_audio():
+        play(audio)
+    
+    # Create a daemon thread to play the audio
+    thread = threading.Thread(target=play_audio)
+    thread.daemon = True
+    thread.start()
+
+rec_player = None
 def rec_play():
     global record_file
     global rec_player
@@ -187,6 +209,11 @@ def rec_play():
         ui.notify("请先录音")
         return
 
+    audio = AudioSegment.from_file(record_file)    
+    audio = audio + 15
+    play_audio_as_daemon(audio)
+
+'''
     if rec_player is None:
         rec_player = ui.audio(record_file)
         rec_player.set_visibility(False)
@@ -197,6 +224,7 @@ def rec_play():
     
     rec_player.play()
     print("Playing recorded audio succeed ...", record_file)
+'''
 
 def on_play(speed):
     global player
@@ -335,7 +363,7 @@ def on_volume():
 
 # Define global variables for recording
 fs = 44100  # Sample rate
-channels = 2  # Number of audio channels
+channels = 0  # Number of audio channels
 format = pyaudio.paInt16  # Sample format
 chunk = 1024  # Chunk size
 recording = []
@@ -395,6 +423,8 @@ def on_record():
         stop_recording(f"{r}.wav")
         record_file = f"{r}.wav"
         flag_recording = False
+        if check_nr.value:
+            noise_reduction(record_file)
         ui.notify("录音结束")
 
 # main 
@@ -446,14 +476,18 @@ with ui.row().style("height:auto;width:auto"):
 with ui.card().classes('no-shadow border-[3px] items-center'):
     with ui.row():
         ui.button("生成英文语音", icon='audio_file', on_click=on_generate, color='blue')
-        ui.space()
-        ui.space()
         b1 = ui.button("1倍速播放", icon='play_circle', on_click=lambda: on_play(1), color='darkblue')
         b2 = ui.button("2倍速播放", icon='play_circle', on_click=lambda: on_play(2), color='darkblue')
         b3 = ui.button("3倍速播放", icon='play_circle', on_click=lambda: on_play(3), color='darkblue')
         b4 = ui.button("4倍速播放", icon='play_circle', on_click=lambda: on_play(4), color='darkblue')
-        ui.space()
-        ui.space()
+
+    ui.splitter()
+
+    with ui.row():
+        check_nr = ui.checkbox("降噪")
+        chan = ui.input("录音通道", value=1)
+        channels = int(chan.value)
+
         bRecord = RecordButton("录音", icon='mic') 
         
         bPlay = ui.button("播放", icon='play_circle', on_click=rec_play, color='darkblue')
