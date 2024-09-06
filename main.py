@@ -137,6 +137,7 @@ def on_translate_c2e():
         else:
             on_en_display()
         ui.notify("翻译完成")
+        on_generate()
     else:
         ui.notify("翻译失败")
 
@@ -333,6 +334,7 @@ def on_gen_en():
         else:
             on_en_display()
         ui.notify("获取英文句子成功")
+        on_generate()
     else:
         ui.notify("获取英文句子失败")
 
@@ -433,11 +435,17 @@ examples_cn = []
 examples_en = []
 
 # 读取示例文本, 并将每一行保存到一个列表中
-with open('examples_cn.txt', 'r', encoding='utf-8') as f:
-    examples_cn = f.readlines()
+try:
+    with open('examples_cn.txt', 'r', encoding='utf-8') as f:
+        examples_cn = f.readlines()
+except:
+    pass
 
-with open('examples_en.txt', 'r', encoding='utf-8') as f:
-    examples_en = f.readlines()
+try:
+    with open('examples_en.txt', 'r', encoding='utf-8') as f:
+        examples_en = f.readlines()
+except:
+    pass
 
 with ui.row().style("height:auto;width:auto"):
     with ui.card().classes('no-shadow border-[3px]'):
@@ -481,7 +489,7 @@ with ui.card().classes('no-shadow border-[3px] items-center'):
         b3 = ui.button("3倍速播放", icon='play_circle', on_click=lambda: on_play(3), color='darkblue')
         b4 = ui.button("4倍速播放", icon='play_circle', on_click=lambda: on_play(4), color='darkblue')
 
-    ui.splitter()
+    ui.separator()
 
     with ui.row():
         check_nr = ui.checkbox("降噪")
