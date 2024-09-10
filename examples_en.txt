@@ -5,3 +5,4 @@ The transfer of value without relying on a trusted third party on the Internet h
 Bitcoin will change the world by relying on his two attributes: passing on value and solidifying the truth.
 When Bitcoin relies on a proof-of-work mechanism to deliver value, it produces a more valuable byproduct: solidifying the truth.
 The truth is placed into the Bitcoin transaction and locked into the block after proof of work. The cost is staggering because breaking the truth is equivalent to breaking the value transmitted by the Bitcoin network. The truth is thus solidified.
+Workers and capitalists are not enemies. On the contrary, they are comrades on the same front, and they are all tax-paying people. Their common enemy is those who rely on taxes for their livelihood. Only those people will mislead workers to be hostile to capitalists.

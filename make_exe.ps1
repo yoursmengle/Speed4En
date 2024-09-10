@@ -1,4 +1,7 @@
 venv/scripts/activate.ps1
 python -m pip install -r requirements.txt
-python main.py
+python build.py
+cp dist/*.exe .
+dir *.exe
+
 
